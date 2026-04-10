@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Wishlist của Bòi Bói Boi🫃🏻</title>
+<title>Danh sách ước mơ 🧚‍♀️</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;600&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
 
@@ -69,10 +69,31 @@ input,textarea,select{
   background:#222;
   font-size:12px;
   cursor:pointer;
+  transition:0.2s;
 }
 
+.priority div:hover{
+  background:#333;
+}
+
+/* ACTIVE */
 .activeP{
-  background:#ff4f87;
+  background: linear-gradient(90deg,#ff4f87,#ff8fb1);
+  box-shadow:0 0 10px rgba(255,79,135,0.6);
+  transform:scale(1.05);
+}
+
+/* SHAKE */
+@keyframes shake{
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-3px);}
+  50%{transform:translateX(3px);}
+  75%{transform:translateX(-2px);}
+  100%{transform:translateX(0);}
+}
+
+.shake{
+  animation:shake 0.25s;
 }
 
 /* BUTTON */
@@ -106,7 +127,6 @@ button{
 
 .priority-tag{
   font-size:12px;
-  margin-top:4px;
   color:#ff9db8;
 }
 
@@ -140,7 +160,6 @@ button{
 
 <div class="container">
 
-<!-- FORM -->
 <div class="card">
 
 <input id="name" placeholder="🎁 Tên quà...">
@@ -167,7 +186,6 @@ button{
 
 </div>
 
-<!-- LIST -->
 <div class="card">
 <h3>📋 Wishlist</h3>
 <div id="list"></div>
@@ -181,12 +199,20 @@ let priority = "💭 Đang fomo";
 
 const listEl = document.getElementById("list");
 
-/* PRIORITY CLICK */
+/* PRIORITY CLICK + SHAKE */
 document.querySelectorAll("#priorityBox div").forEach(el=>{
   el.onclick = function(){
     priority = this.getAttribute("data");
-    document.querySelectorAll("#priorityBox div").forEach(x=>x.classList.remove("activeP"));
+
+    document.querySelectorAll("#priorityBox div").forEach(x=>{
+      x.classList.remove("activeP");
+    });
+
     this.classList.add("activeP");
+
+    // rung nhẹ
+    this.classList.add("shake");
+    setTimeout(()=>this.classList.remove("shake"),250);
   }
 });
 
@@ -237,8 +263,13 @@ document.getElementById("addBtn").onclick = function(){
   save();
   render();
 
+  // reset input
   ["name","price","link","note"].forEach(id=>document.getElementById(id).value="");
-}
+
+  // reset priority về mặc định
+  priority = "💭 Đang fomo";
+  document.querySelectorAll("#priorityBox div").forEach(x=>x.classList.remove("activeP"));
+};
 
 function del(i){
   items.splice(i,1);
