@@ -2,32 +2,33 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Wislist của Bòi Bói Boi🫃🏻</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wishlist của Bòi Bói Boi🫃🏻</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;600&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
 
 <style>
 body{
   margin:0;
-  font-family:'Quicksand',sans-serif;
+  font-family:'Inter',sans-serif;
   background: radial-gradient(circle at top,#2b0b12,#000);
   color:white;
 }
 
 .header{
   padding:20px;
-  text-align:center;
-  border-bottom:1px solid #333;
-}
-
-.title{
   font-family:'Playfair Display';
   font-size:22px;
-  color:#ff7b9c;
+  color:#ff6b9d;
 }
 
-.subtitle{
-  font-size:13px;
-  color:#aaa;
+.sub{
+  text-align:center;
+  font-family:'Dancing Script',cursive;
+  font-size:18px;
+  color:#ff9db8;
+  margin-top:-10px;
 }
 
 .container{
@@ -40,13 +41,13 @@ body{
   background:#111;
   border-radius:20px;
   padding:15px;
-  margin-top:15px;
-  box-shadow:0 0 20px rgba(255,0,80,0.2);
+  margin-bottom:15px;
+  box-shadow:0 0 25px rgba(255,0,80,0.15);
 }
 
-input,select,textarea{
+input,textarea,select{
   width:100%;
-  margin-top:10px;
+  margin-top:8px;
   padding:12px;
   border-radius:12px;
   border:none;
@@ -54,26 +55,27 @@ input,select,textarea{
   color:white;
 }
 
+/* PRIORITY */
 .priority{
   display:flex;
-  gap:5px;
+  flex-wrap:wrap;
+  gap:6px;
   margin-top:10px;
 }
 
 .priority div{
-  flex:1;
-  padding:8px;
+  padding:8px 10px;
   border-radius:10px;
-  text-align:center;
   background:#222;
-  cursor:pointer;
   font-size:12px;
+  cursor:pointer;
 }
 
 .activeP{
   background:#ff4f87;
 }
 
+/* BUTTON */
 button{
   width:100%;
   margin-top:12px;
@@ -82,153 +84,176 @@ button{
   border-radius:12px;
   background:linear-gradient(90deg,#ff4f87,#ff8fb1);
   color:white;
-  font-weight:bold;
+  font-weight:600;
 }
 
+/* ITEM */
 .item{
   background:#111;
-  border-radius:15px;
-  padding:10px;
+  border-radius:18px;
+  padding:12px;
   margin-top:10px;
 }
 
-img{
-  width:100%;
-  border-radius:10px;
-  margin-top:5px;
+.title{
+  font-weight:600;
+}
+
+.meta{
+  font-size:12px;
+  color:#aaa;
+}
+
+.priority-tag{
+  font-size:12px;
+  margin-top:4px;
+  color:#ff9db8;
+}
+
+.actions{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+}
+
+.actions button{
+  flex:1;
+  font-size:12px;
+  background:#222;
+}
+
+.buy{
+  background:#ff4f87 !important;
 }
 
 .done{
   opacity:0.5;
   text-decoration:line-through;
 }
-
-.actions{
-  display:flex;
-  gap:5px;
-  margin-top:5px;
-}
-
-.actions button{
-  font-size:11px;
-}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="title">🌹 Wishlist của Bòi Bói Boi🫃🏻</div>
-  <div class="subtitle">Thêm món quà anh thích vào đây nhoéeee 💌</div>
-</div>
+<div class="header">🌹 Wishlist của Bòi Bói Boi🫃🏻</div>
+<div class="sub">Thêm món quà anh thích vào đây nhoéeee 💌</div>
 
 <div class="container">
 
+<!-- FORM -->
 <div class="card">
 
-<input id="name" placeholder="💝 Tên quà tặng" />
+<input id="name" placeholder="🎁 Tên quà...">
+<input id="price" placeholder="💰 Giá...">
+<input id="link" placeholder="🔗 Link sản phẩm...">
+
 <select id="category">
-  <option>💖 Quà đôi & lãng mạn</option>
-  <option>👕 Thời trang</option>
-  <option>💻 Công nghệ</option>
+<option>💖 Lãng mạn</option>
+<option>👕 Thời trang</option>
+<option>💻 Công nghệ</option>
 </select>
 
-<input id="price" placeholder="💰 Giá (VND)" />
-<input id="link" placeholder="🔗 Link sản phẩm" />
-<input id="image" placeholder="🖼️ Link ảnh" />
-<textarea id="note" placeholder="💬 Ghi chú thêm"></textarea>
+<textarea id="note" placeholder="💬 Ghi chú..."></textarea>
 
-<div class="priority">
-  <div onclick="setP(this,1)">🤍 Ước</div>
-  <div onclick="setP(this,2)">🌷 Thích</div>
-  <div onclick="setP(this,3)">🥺 Muốn</div>
-  <div onclick="setP(this,4)">🔥 Phải có</div>
+<div class="priority" id="priorityBox">
+  <div data="💭 Đang fomo">💭 Đang fomo</div>
+  <div data="🌷 Thích nha">🌷 Thích nha</div>
+  <div data="🥺 Muốn lắm lắm">🥺 Muốn lắm lắm</div>
+  <div data="💗 Cần rồi">💗 Cần rồi</div>
+  <div data="🔥 Phải có">🔥 Phải có</div>
 </div>
 
-<button onclick="addItem()">➕ Thêm vào danh sách 💖</button>
+<button id="addBtn">➕ Thêm vào wishlist</button>
 
 </div>
 
+<!-- LIST -->
+<div class="card">
+<h3>📋 Wishlist</h3>
 <div id="list"></div>
+</div>
 
 </div>
 
 <script>
-let items=JSON.parse(localStorage.getItem("lv4"))||[];
-let priority=1;
+let items = JSON.parse(localStorage.getItem("wishlist")) || [];
+let priority = "💭 Đang fomo";
+
+const listEl = document.getElementById("list");
+
+/* PRIORITY CLICK */
+document.querySelectorAll("#priorityBox div").forEach(el=>{
+  el.onclick = function(){
+    priority = this.getAttribute("data");
+    document.querySelectorAll("#priorityBox div").forEach(x=>x.classList.remove("activeP"));
+    this.classList.add("activeP");
+  }
+});
 
 function save(){
- localStorage.setItem("lv4",JSON.stringify(items));
-}
-
-function setP(el,p){
- priority=p;
- document.querySelectorAll(".priority div").forEach(x=>x.classList.remove("activeP"));
- el.classList.add("activeP");
+  localStorage.setItem("wishlist", JSON.stringify(items));
 }
 
 function render(){
- let list=document.getElementById("list");
- list.innerHTML="";
+  listEl.innerHTML = "";
 
- items.forEach((item,i)=>{
-  let div=document.createElement("div");
-  div.className="item";
+  items.forEach((item,i)=>{
+    let div = document.createElement("div");
+    div.className = "item";
 
-  div.innerHTML=`
-   <div class="${item.done?'done':''}">
-    <strong>${item.name}</strong> (${item.category})
-    <div>💰 ${item.price||0}</div>
-    <div>${item.note||""}</div>
-    ${item.image?`<img src="${item.image}">`:""}
-    ${item.link?`<a href="${item.link}" target="_blank">🛒 Xem</a>`:""}
-   </div>
+    div.innerHTML = `
+      <div class="${item.done?'done':''}">
+        <div class="title">${item.name}</div>
+        <div class="meta">${item.price} • ${item.category}</div>
+        <div class="priority-tag">${item.priority}</div>
+        <div class="meta">${item.note || ""}</div>
+      </div>
 
-   <div class="actions">
-    <button onclick="toggle(${i})">✔️</button>
-    <button onclick="del(${i})">❌</button>
-   </div>
-  `;
+      <div class="actions">
+        <button class="buy" onclick="openLink('${item.link}')">🛒</button>
+        <button onclick="toggle(${i})">✔️</button>
+        <button onclick="del(${i})">❌</button>
+      </div>
+    `;
 
-  list.appendChild(div);
- });
+    listEl.appendChild(div);
+  });
 }
 
-function addItem(){
- let name=nameInput.value;
- if(!name) return alert("Nhập quà 😾");
+document.getElementById("addBtn").onclick = function(){
+  let name = document.getElementById("name").value;
+  if(!name) return alert("Nhập tên 😾");
 
- items.push({
-  name,
-  category:category.value,
-  price:price.value,
-  link:link.value,
-  image:image.value,
-  note:note.value,
-  priority,
-  done:false
- });
+  items.push({
+    name,
+    price:document.getElementById("price").value,
+    link:document.getElementById("link").value,
+    category:document.getElementById("category").value,
+    note:document.getElementById("note").value,
+    priority,
+    done:false
+  });
 
- save();
- render();
+  save();
+  render();
 
- nameInput.value="";
- linkInput.value="";
- imageInput.value="";
- noteInput.value="";
- priceInput.value="";
+  ["name","price","link","note"].forEach(id=>document.getElementById(id).value="");
 }
 
 function del(i){
- items.splice(i,1);
- save();
- render();
+  items.splice(i,1);
+  save();
+  render();
 }
 
 function toggle(i){
- items[i].done=!items[i].done;
- save();
- render();
+  items[i].done=!items[i].done;
+  save();
+  render();
+}
+
+function openLink(link){
+  if(link) window.open(link);
 }
 
 render();
