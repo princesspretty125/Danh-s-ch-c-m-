@@ -3,291 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Danh sách ước mơ 🧚‍♀️</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;600&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+<title>Wishlist Realtime</title>
 
 <style>
 body{
-  margin:0;
-  font-family:'Inter',sans-serif;
-  background: radial-gradient(circle at top,#2b0b12,#000);
-  color:white;
-}
-
-.header{
+  font-family: Arial;
+  background:#fff0f5;
   padding:20px;
-  font-family:'Playfair Display';
-  font-size:22px;
-  color:#ff6b9d;
 }
 
-.sub{
-  text-align:center;
-  font-family:'Dancing Script',cursive;
-  font-size:18px;
-  color:#ff9db8;
-  margin-top:-10px;
-}
+.container{max-width:500px;margin:auto}
 
-.container{
-  max-width:520px;
-  margin:auto;
-  padding:15px;
-}
+h2{text-align:center}
 
-.card{
-  background:#111;
-  border-radius:20px;
-  padding:15px;
-  margin-bottom:15px;
-  box-shadow:0 0 25px rgba(255,0,80,0.15);
-}
-
-input,textarea,select{
+input,button{
   width:100%;
-  margin-top:8px;
   padding:12px;
+  margin:8px 0;
   border-radius:12px;
-  border:none;
-  background:#1c1c1c;
-  color:white;
+  border:1px solid #ddd;
 }
 
-/* PRIORITY */
-.priority{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:10px;
-}
-
-.priority div{
-  padding:8px 10px;
-  border-radius:10px;
-  background:#222;
-  font-size:12px;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-.priority div:hover{
-  background:#333;
-}
-
-/* ACTIVE */
-.activeP{
-  background: linear-gradient(90deg,#ff4f87,#ff8fb1);
-  box-shadow:0 0 10px rgba(255,79,135,0.6);
-  transform:scale(1.05);
-}
-
-/* SHAKE */
-@keyframes shake{
-  0%{transform:translateX(0);}
-  25%{transform:translateX(-3px);}
-  50%{transform:translateX(3px);}
-  75%{transform:translateX(-2px);}
-  100%{transform:translateX(0);}
-}
-
-.shake{
-  animation:shake 0.25s;
-}
-
-/* BUTTON */
 button{
-  width:100%;
-  margin-top:12px;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(90deg,#ff4f87,#ff8fb1);
+  background:#ff69b4;
   color:white;
-  font-weight:600;
+  font-weight:bold;
+  border:none;
 }
 
-/* ITEM */
+.tag{
+  padding:8px 12px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  display:inline-block;
+  margin:5px;
+  cursor:pointer;
+}
+
+.tag.active{
+  background:#ff69b4;
+  color:white;
+}
+
 .item{
-  background:#111;
-  border-radius:18px;
+  background:white;
   padding:12px;
+  border-radius:12px;
   margin-top:10px;
 }
-
-.title{
-  font-weight:600;
-}
-
-.meta{
-  font-size:12px;
-  color:#aaa;
-}
-
-.priority-tag{
-  font-size:12px;
-  color:#ff9db8;
-}
-
-.actions{
-  display:flex;
-  gap:6px;
-  margin-top:8px;
-}
-
-.actions button{
-  flex:1;
-  font-size:12px;
-  background:#222;
-}
-
-.buy{
-  background:#ff4f87 !important;
-}
-
-.done{
-  opacity:0.5;
-  text-decoration:line-through;
-}
+.priority{opacity:0.7;font-size:13px}
 </style>
 </head>
 
 <body>
 
-<div class="header">🌹 Wishlist của Bòi Bói Boi🫃🏻</div>
-<div class="sub">Thêm món quà anh thích vào đây nhoéeee 💌</div>
-
 <div class="container">
 
-<div class="card">
+<h2>💗 Wishlist Realtime</h2>
 
-<input id="name" placeholder="🎁 Tên quà...">
-<input id="price" placeholder="💰 Giá...">
-<input id="link" placeholder="🔗 Link sản phẩm...">
+<input id="name" placeholder="Nhập món muốn thêm...">
 
-<select id="category">
-<option>💖 Lãng mạn</option>
-<option>👕 Thời trang</option>
-<option>💻 Công nghệ</option>
-</select>
-
-<textarea id="note" placeholder="💬 Ghi chú..."></textarea>
-
-<div class="priority" id="priorityBox">
-  <div data="💭 Đang fomo">💭 Đang fomo</div>
-  <div data="🌷 Thích nha">🌷 Thích nha</div>
-  <div data="🥺 Muốn lắm lắm">🥺 Muốn lắm lắm</div>
-  <div data="💗 Cần rồi">💗 Cần rồi</div>
-  <div data="🔥 Phải có">🔥 Phải có</div>
+<div>
+  <span class="tag">💭 Đang fomo</span>
+  <span class="tag">🌷 Thích nha</span>
+  <span class="tag">🥺 Muốn lắm lắm</span>
+  <span class="tag">💗 Cần rồi</span>
+  <span class="tag">🔥 Phải có</span>
 </div>
 
-<button id="addBtn">➕ Thêm vào wishlist</button>
+<button onclick="addItem()">Thêm</button>
 
-</div>
-
-<div class="card">
-<h3>📋 Wishlist</h3>
 <div id="list"></div>
-</div>
 
 </div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-let items = JSON.parse(localStorage.getItem("wishlist")) || [];
-let priority = "💭 Đang fomo";
+const firebaseConfig = {
+  apiKey: "demo",
+  authDomain: "wishlist-c5669.firebaseapp.com",
+  databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "wishlist-c5669",
+  storageBucket: "wishlist-c5669.appspot.com",
+  messagingSenderId: "demo",
+  appId: "demo"
+};
 
-const listEl = document.getElementById("list");
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-/* PRIORITY CLICK + SHAKE */
-document.querySelectorAll("#priorityBox div").forEach(el=>{
-  el.onclick = function(){
-    priority = this.getAttribute("data");
+let selected = "";
 
-    document.querySelectorAll("#priorityBox div").forEach(x=>{
-      x.classList.remove("activeP");
-    });
+document.querySelectorAll('.tag').forEach(t=>{
+  t.onclick = () => {
+    document.querySelectorAll('.tag').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    selected = t.innerText;
 
-    this.classList.add("activeP");
-
-    // rung nhẹ
-    this.classList.add("shake");
-    setTimeout(()=>this.classList.remove("shake"),250);
+    if(navigator.vibrate) navigator.vibrate(30);
   }
 });
 
-function save(){
-  localStorage.setItem("wishlist", JSON.stringify(items));
+function addItem(){
+  const name = document.getElementById("name").value;
+  if(!name || !selected) return;
+
+  db.ref("wishlist").push({
+    name,
+    priority: selected
+  });
+
+  document.getElementById("name").value = "";
 }
 
-function render(){
-  listEl.innerHTML = "";
+db.ref("wishlist").on("value", (snap)=>{
+  const data = snap.val();
+  const list = document.getElementById("list");
 
-  items.forEach((item,i)=>{
-    let div = document.createElement("div");
+  list.innerHTML = "";
+
+  for(let id in data){
+    const item = data[id];
+
+    const div = document.createElement("div");
     div.className = "item";
-
     div.innerHTML = `
-      <div class="${item.done?'done':''}">
-        <div class="title">${item.name}</div>
-        <div class="meta">${item.price} • ${item.category}</div>
-        <div class="priority-tag">${item.priority}</div>
-        <div class="meta">${item.note || ""}</div>
-      </div>
-
-      <div class="actions">
-        <button class="buy" onclick="openLink('${item.link}')">🛒</button>
-        <button onclick="toggle(${i})">✔️</button>
-        <button onclick="del(${i})">❌</button>
-      </div>
+      <div>${item.name}</div>
+      <div class="priority">${item.priority}</div>
     `;
 
-    listEl.appendChild(div);
-  });
-}
-
-document.getElementById("addBtn").onclick = function(){
-  let name = document.getElementById("name").value;
-  if(!name) return alert("Nhập tên 😾");
-
-  items.push({
-    name,
-    price:document.getElementById("price").value,
-    link:document.getElementById("link").value,
-    category:document.getElementById("category").value,
-    note:document.getElementById("note").value,
-    priority,
-    done:false
-  });
-
-  save();
-  render();
-
-  // reset input
-  ["name","price","link","note"].forEach(id=>document.getElementById(id).value="");
-
-  // reset priority về mặc định
-  priority = "💭 Đang fomo";
-  document.querySelectorAll("#priorityBox div").forEach(x=>x.classList.remove("activeP"));
-};
-
-function del(i){
-  items.splice(i,1);
-  save();
-  render();
-}
-
-function toggle(i){
-  items[i].done=!items[i].done;
-  save();
-  render();
-}
-
-function openLink(link){
-  if(link) window.open(link);
-}
-
-render();
+    list.appendChild(div);
+  }
+});
 </script>
 
 </body>
