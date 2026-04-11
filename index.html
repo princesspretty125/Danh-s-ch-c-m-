@@ -43,7 +43,7 @@
   messagingSenderId: "821194575297",
   appId: "1:821194575297:web:185b7837e6cdee4783f340",
   measurementId: "G-RHE1QBW9WX"
-      };
+       };
 
        const app = initializeApp(firebaseConfig);
        const db = getFirestore(app);
@@ -115,15 +115,17 @@
        onSnapshot(query(giftCol, orderBy("date", "desc")), (s) => {
            const list = document.getElementById('list');
            let data = [];
+           
            s.forEach(d => {
-               const item = d.data();
-               if (item.date) data.push({ id: d.id, ...item });
+               data.push({ id: d.id, ...d.data() });
            });
            
            data.sort((a, b) => {
                const scoreDiff = scores[b.prio] - scores[a.prio];
                if (scoreDiff !== 0) return scoreDiff;
-               return (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0);
+               const timeA = a.date?.toMillis() || Date.now();
+               const timeB = b.date?.toMillis() || Date.now();
+               return timeB - timeA;
            });
 
            list.innerHTML = '';
@@ -159,14 +161,14 @@
                    }
                }, 300);
            }
-       });
+       }, { includeMetadataChanges: true });
    </script>
 </head>
 <body class="p-4 pb-24">
    <div class="max-w-md mx-auto">
        <div class="text-center mb-10 pt-6">
            <h1 class="text-2xl font-black text-pink-500 uppercase tracking-tighter">🌹 Wishlist Của Bòi Bói Boi 🫄</h1>
-           <p class="text-gray-400 text-xs italic mt-2">Thêm món quà anh thích vào đây nhoéee💌/p>
+           <p class="text-gray-400 text-xs italic mt-2">Ghi lại món quà anh thích nhất!</p>
        </div>
        <div class="bg-[#161616] p-7 rounded-[40px] border border-white/5 space-y-6 shadow-2xl">
            <div>
