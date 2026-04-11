@@ -46,7 +46,7 @@
             const price = document.getElementById('giftPrice').value;
             const note = document.getElementById('giftNote').value;
 
-            if (!name || !price) return alert("Nhập đủ tên và giá nhé!");
+            if (!name || !price) return alert("Nhập đủ tên nhé!");
 
             btn.classList.add('btn-bounce-glow');
             setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
@@ -83,7 +83,7 @@
 
                 items.forEach(item => {
                     const isBought = item.status === 'bought';
-                    const labels = ["", "💬 Ước thôi", "🏺 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
+                    const labels = ["", "💬 FOMO", "🌷 Thích nha", "🥺 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
 
                     const html = `
                         <div class="p-5 mb-4 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
@@ -137,8 +137,8 @@
 <body class="flex justify-center min-h-screen p-4 pb-24">
     <div class="w-full max-w-md">
         <div class="text-center my-10">
-            <h1 class="text-4xl font-black italic text-pink-200 tracking-tighter">Wishlist App 🧞‍♀️</h1>
-            <p class="text-zinc-600 text-[10px] mt-1 tracking-[0.2em] uppercase font-bold italic">Mọi điều em thích, anh sẽ nhớ</p>
+            <h1 class="text-4xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi🫃🏻</h1>
+            <p class="text-zinc-600 text-[10px] mt-1 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee💌</p>
         </div>
 
         <div class="card-main p-7 mb-14 shadow-2xl border-t border-zinc-800/50">
@@ -170,8 +170,8 @@
                     <div class="grid grid-cols-1 gap-2">
                         <button onclick="selectPriority(5)" id="priority-5" class="priority-btn p-4 rounded-2xl italic">🔥 PHẢI CÓ</button>
                         <button onclick="selectPriority(4)" id="priority-4" class="priority-btn p-4 rounded-2xl italic">💕 Cần rồi</button>
-                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn p-4 rounded-2xl italic">🙄 Muốn lắm</button>
-                        <button onclick="selectPriority(2)" id="priority-2" class="priority-btn p-4 rounded-2xl italic">🏺 Thích nha</button>
+                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn p-4 rounded-2xl italic">🥺 FOMO</button>
+                        <button onclick="selectPriority(2)" id="priority-2" class="priority-btn p-4 rounded-2xl italic">🌷 Thích nha</button>
                         <button onclick="selectPriority(1)" id="priority-1" class="priority-btn p-4 rounded-2xl active-priority italic">💬 Ước thôi</button>
                     </div>
                 </div>
