@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist của Bòi Bói Boi 🫃🏻</title>
+    <title>Wishlist của BòiBóiBoi🫃🏻</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -56,7 +56,7 @@
             const price = document.getElementById('giftPrice').value;
             const note = document.getElementById('giftNote').value;
 
-            if (!name || !price) return alert("Nhập đủ tên và giá nhé!");
+            if (!name || !price) return alert("Nhập đủ tên nhé!");
 
             btn.classList.add('btn-bounce-glow');
             setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
@@ -111,7 +111,7 @@
                                     </span>
                                     <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : 'text-pink-100'}">${item.name}</h3>
                                     <p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">💕 ${item.category} • ${item.price}đ</p>
-                                    ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Note: ${item.note}</p>` : ''}
+                                    ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Ghi chú: ${item.note}</p>` : ''}
                                 </div>
                                 <div class="flex flex-col gap-4">
                                     <button onclick="updateStatus('${item.id}', '${isBought ? 'pending' : 'bought'}')" class="w-14 h-14 ${isBought ? 'bg-green-500' : 'bg-zinc-900'} border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">💃</button>
@@ -146,30 +146,30 @@
 <body class="flex justify-center min-h-screen p-4 pb-24">
     <div class="w-full max-w-md">
         <div class="text-center my-12">
-            <h1 class="text-4xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi 🫃🏻</h1>
-            <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee 💌</p>
+            <h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Wishlist của BòiBóiBoi🫃🏻</h1>
+            <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee💌</p>
         </div>
 
         <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
             <div class="space-y-6">
                 <div>
                     <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">❤️ Tên quà tặng</label>
-                    <input type="text" id="giftName" placeholder="Ví dụ: Vòng tay bạc khắc tên..." class="w-full p-4.5 rounded-2xl mt-2 text-sm">
+                    <input type="text" id="giftName" placeholder="Tên món quà..." class="w-full p-4.5 rounded-2xl mt-2 text-sm">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="relative">
                         <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🏷️ Danh mục</label>
                         <select id="category" class="w-full p-4.5 rounded-2xl mt-2 text-sm appearance-none pr-10">
-                            <option value="Quà Đôi & Lãng Mạn">💕 Quà Đôi & Lãng Mạn</option>
-                            <option value="Công Nghệ">🎮 Công Nghệ</option>
-                            <option value="Thời Trang">👕 Thời Trang</option>
-                            <option value="Thể Thao">⚽ Thể Thao</option>
+                            <option value="💕 Lãng Mạn">💕 Lãng Mạn</option>
+                            <option value="🎮 Công Nghệ">🎮 Công Nghệ</option>
+                            <option value="👕 Thời Trang">👕 Thời Trang</option>
+                            <option value="⚽ Thể Thao">⚽ Thể Thao</option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-4 bottom-5 text-zinc-700 text-[10px]"></i>
                     </div>
                     <div>
-                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá ước tính</label>
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá (VNĐ)</label>
                         <div class="relative">
                             <input type="text" id="giftPrice" placeholder="500,000" class="w-full p-4.5 rounded-2xl mt-2 text-sm font-bold pr-10">
                             <span class="absolute right-4 bottom-4.5 text-zinc-600 font-bold">đ</span>
@@ -189,18 +189,18 @@
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📝 Ghi chú thêm</label>
-                    <textarea id="giftNote" placeholder="Màu hồng nhé anh, size M..." class="w-full p-4.5 rounded-2xl mt-2 text-sm h-28 resize-none font-medium"></textarea>
+                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📝 Ghi chú chi tiết</label>
+                    <textarea id="giftNote" placeholder="Size, màu sắc, cấu hình hoặc dán link sản phẩm vào đây..." class="w-full p-4.5 rounded-2xl mt-2 text-sm h-28 resize-none font-medium"></textarea>
                 </div>
 
                 <button onclick="addGift(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">
-                    🚀 THÊM VÀO 💖
+                    🚀 THÊM VÀO WISHLIST 💖
                 </button>
             </div>
         </div>
 
         <div class="flex items-center gap-4 mb-10 px-2">
-            <h2 class="text-2xl font-black text-pink-200 italic">Danh sách ước mơ 🧚🏻‍♂️</h2>
+            <h2 class="text-xl font-black text-pink-200 italic">Danh sách ước mơ 🧚🏻‍♂️</h2>
             <div class="h-[1px] flex-1 bg-zinc-900"></div>
         </div>
 
