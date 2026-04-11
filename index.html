@@ -12,7 +12,10 @@ body{
   padding:20px;
 }
 
-.container{max-width:500px;margin:auto}
+.container{
+  max-width:500px;
+  margin:auto;
+}
 
 h2{text-align:center}
 
@@ -31,13 +34,18 @@ button{
   border:none;
 }
 
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
 .tag{
   padding:8px 12px;
   border-radius:20px;
   border:1px solid #ccc;
-  display:inline-block;
-  margin:5px;
   cursor:pointer;
+  font-size:13px;
 }
 
 .tag.active{
@@ -50,8 +58,21 @@ button{
   padding:12px;
   border-radius:12px;
   margin-top:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  position:relative;
 }
-.priority{opacity:0.7;font-size:13px}
+
+.priority{
+  font-size:12px;
+  opacity:0.7;
+}
+
+.delete{
+  position:absolute;
+  right:10px;
+  top:10px;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -63,12 +84,12 @@ button{
 
 <input id="name" placeholder="Nhập món muốn thêm...">
 
-<div>
-  <span class="tag">💭 Đang fomo</span>
-  <span class="tag">🌷 Thích nha</span>
-  <span class="tag">🥺 Muốn lắm lắm</span>
-  <span class="tag">💗 Cần rồi</span>
-  <span class="tag">🔥 Phải có</span>
+<div class="tags">
+  <div class="tag">💭 Đang fomo</div>
+  <div class="tag">🌷 Thích nha</div>
+  <div class="tag">🥺 Muốn lắm lắm</div>
+  <div class="tag">💗 Cần rồi</div>
+  <div class="tag">🔥 Phải có</div>
 </div>
 
 <button onclick="addItem()">Thêm</button>
@@ -77,47 +98,60 @@ button{
 
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
+
+// 🔥 DÁN CONFIG FIREBASE CỦA M VÀO ĐÂY
 const firebaseConfig = {
-  apiKey: "demo",
-  authDomain: "wishlist-c5669.firebaseapp.com",
+  apiKey: "DÁN_VÀO",
+  authDomain: "DÁN_VÀO",
   databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "wishlist-c5669",
-  storageBucket: "wishlist-c5669.appspot.com",
-  messagingSenderId: "demo",
-  appId: "demo"
+  storageBucket: "DÁN_VÀO",
+  messagingSenderId: "DÁN_VÀO",
+  appId: "DÁN_VÀO"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let selected = "";
+let selectedTag = "";
 
-document.querySelectorAll('.tag').forEach(t=>{
-  t.onclick = () => {
-    document.querySelectorAll('.tag').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    selected = t.innerText;
+// chọn tag
+document.querySelectorAll('.tag').forEach(tag=>{
+  tag.onclick = () => {
+    document.querySelectorAll('.tag').forEach(t=>t.classList.remove('active'));
+    tag.classList.add('active');
+    selectedTag = tag.innerText;
 
-    if(navigator.vibrate) navigator.vibrate(30);
+    if(navigator.vibrate){
+      navigator.vibrate(30);
+    }
   }
 });
 
+// ➕ thêm item
 function addItem(){
   const name = document.getElementById("name").value;
-  if(!name || !selected) return;
+  if(!name || !selectedTag) return;
 
   db.ref("wishlist").push({
     name,
-    priority: selected
+    priority: selectedTag
   });
 
   document.getElementById("name").value = "";
 }
 
+// 🗑️ xoá
+function deleteItem(id){
+  db.ref("wishlist/" + id).remove();
+}
+
+// 👀 realtime
 db.ref("wishlist").on("value", (snap)=>{
   const data = snap.val();
   const list = document.getElementById("list");
@@ -130,13 +164,15 @@ db.ref("wishlist").on("value", (snap)=>{
     const div = document.createElement("div");
     div.className = "item";
     div.innerHTML = `
+      <div class="delete" onclick="deleteItem('${id}')">❌</div>
       <div>${item.name}</div>
       <div class="priority">${item.priority}</div>
     `;
 
-    list.appendChild(div);
+    list.prepend(div);
   }
 });
+
 </script>
 
 </body>
