@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist Bòi Bói Boi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -24,16 +25,14 @@
         const db = getFirestore(app);
         const giftCol = collection(db, "gifts");
 
-        const prioScore = {
-            'Phải có': 5,
-            'Cần rồi': 4,
-            'Muốn lắm': 3,
-            'Thích nha': 2,
-            'Ước thôi': 1
-        };
+        const soundClick = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'); // Tiếng click
+        const soundSuccess = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'); // Tiếng ting
+
+        const prioScore = { 'Phải có': 5, 'Cần rồi': 4, 'Muốn lắm': 3, 'Thích nha': 2, 'Ước thôi': 1 };
 
         window.currentPrio = 'Muốn lắm';
         window.selectPrio = (prio, btn) => {
+            soundClick.play(); 
             window.currentPrio = prio;
             document.querySelectorAll('.prio-btn').forEach(b => {
                 b.classList.remove('border-pink-500', 'bg-[#3a2226]', 'text-white');
@@ -54,22 +53,39 @@
             const priceRaw = document.getElementById('gPrice').value.replace(/,/g, "");
             const link = document.getElementById('gLink').value;
             const note = document.getElementById('gNote').value;
-            if(!name || !priceRaw) return alert("Điền đủ tên mới được nha!");
             
-            await addDoc(giftCol, { 
-                name, cate, price: priceRaw, link, note, 
-                prio: window.currentPrio, 
-                bought: false,
-                date: new Date() 
-            });
+            if(!name || !priceRaw) return alert("Điền đủ tên và giá mới được nha!");
+            
+            try {
+                const docRef = await addDoc(giftCol, { 
+                    name, cate, price: priceRaw, link, note, 
+                    prio: window.currentPrio, 
+                    bought: false,
+                    date: new Date() 
+                });
 
-            document.getElementById('gName').value = '';
-            document.getElementById('gPrice').value = '';
-            document.getElementById('gLink').value = '';
-            document.getElementById('gNote').value = '';
+                soundSuccess.play();
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ec4899', '#f472b6', '#ffffff'] });
+
+                document.getElementById('gName').value = '';
+                document.getElementById('gPrice').value = '';
+                document.getElementById('gLink').value = '';
+                document.getElementById('gNote').value = '';
+
+                setTimeout(() => {
+                    const newEl = document.getElementById(`item-${docRef.id}`);
+                    if(newEl) {
+                        newEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        newEl.classList.add('ring-2', 'ring-pink-500', 'animate-pulse');
+                        setTimeout(() => newEl.classList.remove('ring-2', 'ring-pink-500', 'animate-pulse'), 3000);
+                    }
+                }, 800);
+
+            } catch (e) { console.error(e); }
         };
 
         window.toggleBought = async (id, status) => {
+            soundClick.play();
             await updateDoc(doc(db, "gifts", id), { bought: !status });
         };
 
@@ -87,18 +103,17 @@
             items.sort((a, b) => (prioScore[b.prio] || 0) - (prioScore[a.prio] || 0));
 
             items.forEach(i => {
-                const linkHTML = i.link ? `<a href="${i.link}" target="_blank" class="text-blue-400 text-[10px] underline block mt-1">Xem link sản phẩm 🔗</a>` : '';
-                const noteHTML = i.note ? `<div class="text-[10px] text-gray-400 mt-1 italic">📝 ${i.note}</div>` : '';
+                const linkHTML = i.link ? `<a href="${i.link}" target="_blank" class="text-blue-400 text-[10px] underline block mt-1 uppercase font-bold tracking-tighter">🔗 Link sản phẩm</a>` : '';
+                const noteHTML = i.note ? `<div class="text-[10px] text-gray-400 mt-1 italic opacity-80">📝 ${i.note}</div>` : '';
                 
                 div.innerHTML += `
-                <div class="bg-[#1a1a1a] p-4 rounded-2xl mb-3 border ${i.bought ? 'border-green-900 opacity-60' : 'border-[#222]'} transition-all">
+                <div id="item-${i.id}" class="bg-[#1a1a1a] p-4 rounded-2xl mb-3 border ${i.bought ? 'border-green-900 opacity-60' : 'border-[#222]'} transition-all duration-500">
                     <div class="flex justify-between items-start">
                         <div class="flex-1 pr-4">
                             <div class="font-bold text-sm ${i.bought ? 'line-through text-gray-500' : 'text-white'}">${i.name}</div>
                             <div class="flex gap-2 mt-1 flex-wrap">
                                 <span class="text-[9px] bg-[#222] px-2 py-0.5 rounded text-gray-400 font-medium">${i.cate}</span>
                                 <span class="text-[9px] text-pink-400 font-medium italic">Ưu tiên: ${i.prio}</span>
-                                ${i.bought ? '<span class="text-[9px] text-green-500 font-bold uppercase tracking-tighter">● Đã mua</span>' : ''}
                             </div>
                             ${noteHTML}
                             ${linkHTML}
@@ -108,90 +123,92 @@
                         </div>
                     </div>
                     <div class="flex justify-end gap-3 mt-3 pt-3 border-t border-[#222]">
-                        <button onclick="toggleBought('${i.id}', ${i.bought})" class="text-[10px] font-bold ${i.bought ? 'text-gray-500' : 'text-green-500'} uppercase tracking-widest">
-                            ${i.bought ? 'Hoàn tác' : 'Đã mua ✅'}
-                        </button>
-                        <button onclick="deleteGift('${i.id}')" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Xoá 🗑️</button>
+                        <button onclick="toggleBought('${i.id}', ${i.bought})" class="text-[10px] font-bold ${i.bought ? 'text-gray-500' : 'text-green-400'} uppercase tracking-widest">${i.bought ? 'Hoàn tác' : 'Đã mua ✅'}</button>
+                        <button onclick="deleteGift('${i.id}')" class="text-[10px] font-bold text-red-500 uppercase tracking-widest opacity-70">Xoá 🗑️</button>
                     </div>
                 </div>`;
             });
         });
     </script>
+    <style>
+        select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        .prio-btn { transition: all 0.2s ease-in-out; }
+        .prio-btn:active { transform: scale(0.9); }
+    </style>
 </head>
-<body class="bg-[#0c0c0c] text-white p-5 font-sans select-none pb-20">
+<body class="bg-[#0c0c0c] text-white p-5 font-sans select-none pb-20 overflow-x-hidden">
     <div class="max-w-md mx-auto">
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold text-pink-300">🌹 Wishlist của Bòi Bói Boi🫃🏻</h1>
-            <p class="text-gray-500 text-[11px] mt-1 font-medium">Thêm món quà anh thích vào đây nhoéeeee 💌</p>
+            <p class="text-gray-500 text-[11px] mt-1 font-medium italic">"Mọi điều em muốn, anh sẽ nhớ 💌"</p>
         </div>
 
-        <div class="bg-[#161616] p-6 rounded-[35px] border border-[#222] space-y-5 shadow-2xl">
+        <div class="bg-[#161616] p-6 rounded-[35px] border border-[#222] space-y-5 shadow-2xl relative overflow-hidden">
             <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase">💖 Tên quà tặng</p>
+                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase flex items-center gap-1">💖 Tên quà tặng</p>
                 <input id="gName" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all placeholder:text-gray-600" placeholder="Ví dụ: Vòng tay bạc...">
             </div>
             
             <div class="relative">
-                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase">🏷️ Danh mục</p>
+                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase flex items-center gap-1">🏷️ Danh mục</p>
                 <div class="relative">
-                    <select id="gCate" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all text-white appearance-none cursor-pointer">
+                    <select id="gCate" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all text-white cursor-pointer">
                         <option value="💕 Quà đôi">💕 Quà đôi</option>
                         <option value="💻 Công nghệ">💻 Công nghệ</option>
                         <option value="👕 Thời trang">👕 Thời trang</option>
                         <option value="🏠 Đồ dùng hàng ngày">🏠 Đồ dùng hàng ngày</option>
                     </select>
-                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-500">
-                        <span class="text-xs">▼</span>
-                    </div>
+                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-500 text-[10px]">▼</div>
                 </div>
             </div>
 
             <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase">💰 Giá ước tính (VNĐ)</p>
-                <input id="gPrice" type="text" oninput="formatCurrency(this)" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all placeholder:text-gray-600" placeholder="500,000">
+                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase flex items-center gap-1">💰 Giá ước tính (VNĐ)</p>
+                <input id="gPrice" type="text" oninput="formatCurrency(this)" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all placeholder:text-gray-600 font-mono" placeholder="500,000">
             </div>
 
             <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase">🔗 Link sản phẩm (nếu có)</p>
+                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase flex items-center gap-1">🔗 Link sản phẩm (nếu có)</p>
                 <input id="gLink" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all placeholder:text-gray-600" placeholder="Shopee, TikTok link...">
             </div>
 
             <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase">Độ ưu tiên</p>
-                <div class="grid grid-cols-5 gap-1">
-                    <button onclick="selectPrio('Ước thôi', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase mb-3">Độ ưu tiên</p>
+                <div class="grid grid-cols-5 gap-1.5">
+                    <button onclick="selectPrio('Ước thôi', this)" class="prio-btn py-2.5 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 flex flex-col items-center leading-tight">
                         <span class="text-base mb-1">💬</span><span>Ước<br>thôi</span>
                     </button>
-                    <button onclick="selectPrio('Thích nha', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                    <button onclick="selectPrio('Thích nha', this)" class="prio-btn py-2.5 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 flex flex-col items-center leading-tight">
                         <span class="text-base mb-1">🌹</span><span>Thích<br>nha</span>
                     </button>
-                    <button onclick="selectPrio('Muốn lắm', this)" class="prio-btn py-2 rounded-xl border border-pink-500 bg-[#3a2226] text-[9px] text-white transition-all flex flex-col items-center leading-tight">
+                    <button onclick="selectPrio('Muốn lắm', this)" class="prio-btn py-2.5 rounded-xl border border-pink-500 bg-[#3a2226] text-[9px] text-white flex flex-col items-center leading-tight">
                         <span class="text-base mb-1">🥺</span><span>Muốn<br>lắm</span>
                     </button>
-                    <button onclick="selectPrio('Cần rồi', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                    <button onclick="selectPrio('Cần rồi', this)" class="prio-btn py-2.5 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 flex flex-col items-center leading-tight">
                         <span class="text-base mb-1">💕</span><span>Cần<br>rồi</span>
                     </button>
-                    <button onclick="selectPrio('Phải có', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                    <button onclick="selectPrio('Phải có', this)" class="prio-btn py-2.5 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 flex flex-col items-center leading-tight">
                         <span class="text-base mb-1">🔥</span><span>Phải<br>có</span>
                     </button>
                 </div>
             </div>
 
             <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase">🗒️ Ghi chú thêm</p>
-                <input id="gNote" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all placeholder:text-gray-600" placeholder="Size, màu sắc...">
+                <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase flex items-center gap-1">🗒️ Ghi chú thêm</p>
+                <input id="gNote" class="w-full bg-[#222] p-3 rounded-xl border border-[#333] outline-none text-sm focus:border-pink-500 transition-all placeholder:text-gray-600" placeholder="Size, màu sắc hoặc lời nhắn...">
             </div>
 
-            <button onclick="addGift()" class="w-full bg-pink-500 hover:bg-pink-600 py-4 rounded-full font-bold text-sm shadow-lg active:scale-95 transition-all mt-2 uppercase tracking-wider">
-                + Thêm món ❤️
+            <button onclick="addGift()" class="w-full bg-pink-500 hover:bg-pink-600 py-4 rounded-full font-bold text-sm shadow-lg shadow-pink-500/20 active:scale-95 transition-all mt-4 uppercase tracking-widest">
+                + Thêm món quà yêu thích ❤️
             </button>
         </div>
 
-        <div class="mt-10">
-            <h2 class="text-sm font-bold text-gray-400 mb-4 border-b border-[#222] pb-2 flex items-center gap-2">
-                <span>🧚‍♀️</span> Danh sách ước mơ
+        <div class="mt-12">
+            <h2 class="text-sm font-bold text-gray-400 mb-6 border-b border-[#222] pb-3 flex items-center justify-between">
+                <span class="flex items-center gap-2">🧚‍♀️ Danh sách ước mơ</span>
+                <span class="text-[10px] font-normal italic">Sắp xếp theo độ ưu tiên</span>
             </h2>
-            <div id="list"></div>
+            <div id="list" class="space-y-1"></div>
         </div>
     </div>
 </body>
