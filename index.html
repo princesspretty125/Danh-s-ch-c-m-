@@ -22,11 +22,17 @@
            100% { border-color: rgba(255,255,255,0.05); box-shadow: none; background: #161616; }
        }
        .new-item-glow { animation: highlight-glow 1.5s ease-out forwards; border: 2px solid #ec4899 !important; }
+       @keyframes shake {
+           0%, 100% { transform: translateX(0); }
+           25% { transform: translateX(-5px); }
+           75% { transform: translateX(5px); }
+       }
+       .error-shake { animation: shake 0.2s ease-in-out 0s 2; border-color: #ef4444 !important; }
        .prio-btn { transition: all 0.2s ease; }
    </style>
    <script type="module">
        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-       import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+       import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
        const firebaseConfig = {
            apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
@@ -42,7 +48,7 @@
        const db = getFirestore(app);
        const giftCol = collection(db, "gifts");
        let lastAddedId = null;
-       const scores = { 'Phải có': 5, 'Cần rồi': 4, 'Muốn lắm': 3, 'Thích nha': 2, 'Fomo': 1 };
+       const scores = { 'Phải có': 5, 'Cần rồi': 4, 'Muốn lắm': 3, 'Thích nha': 2, 'Ước thôi': 1 };
 
        window.currentPrio = 'Muốn lắm';
        window.selectPrio = (prio, btn) => {
@@ -64,7 +70,7 @@
            const x = (rect.left + rect.width / 2) / window.innerWidth;
            const y = (rect.top + rect.height / 2) / window.innerHeight;
            confetti({
-               particleCount: 120, spread: 80, origin: { x, y },
+               particleCount: 150, spread: 70, origin: { x, y },
                shapes: [confetti.shapeFromText({ text: '🎁', scalar: 3 })],
                colors: ['#f472b6', '#ec4899', '#ffffff']
            });
@@ -74,16 +80,28 @@
            const btn = document.getElementById('mainAddBtn');
            const n = document.getElementById('gName'), p = document.getElementById('gPrice'),
                  c = document.getElementById('gCate'), l = document.getElementById('gLink'), nt = document.getElementById('gNote');
-           if(!n.value || !p.value) return;
+           
+           if(!n.value.trim()) {
+               n.classList.add('error-shake');
+               setTimeout(() => n.classList.remove('error-shake'), 400);
+               return;
+           }
+
            btn.classList.remove('jump-active');
            void btn.offsetWidth;
            btn.classList.add('jump-active');
            triggerBoom(btn);
+
            try {
                const res = await addDoc(giftCol, {
-                   name: n.value, cate: c.value, price: p.value.replace(/,/g, ""),
-                   link: l.value, note: nt.value, prio: window.currentPrio,
-                   bought: false, date: Date.now()
+                   name: n.value.trim(),
+                   cate: c.value,
+                   price: (p.value || "0").replace(/,/g, ""),
+                   link: l.value.trim(),
+                   note: nt.value.trim(),
+                   prio: window.currentPrio,
+                   bought: false,
+                   date: serverTimestamp()
                });
                lastAddedId = res.id;
                n.value = ''; p.value = ''; l.value = ''; nt.value = '';
@@ -95,10 +113,19 @@
 
        onSnapshot(query(giftCol, orderBy("date", "desc")), (s) => {
            const list = document.getElementById('list');
-           list.innerHTML = '';
            let data = [];
-           s.forEach(d => data.push({ id: d.id, ...d.data() }));
-           data.sort((a, b) => scores[b.prio] - scores[a.prio]);
+           s.forEach(d => {
+               const item = d.data();
+               if (item.date) data.push({ id: d.id, ...item });
+           });
+           
+           data.sort((a, b) => {
+               const scoreDiff = scores[b.prio] - scores[a.prio];
+               if (scoreDiff !== 0) return scoreDiff;
+               return (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0);
+           });
+
+           list.innerHTML = '';
            data.forEach(i => {
                list.innerHTML += `
                <div id="item-${i.id}" class="bg-[#161616] p-5 rounded-[25px] mb-4 border ${i.bought ? 'border-green-900 opacity-40' : 'border-white/5'} transition-all shadow-xl">
@@ -109,7 +136,7 @@
                                <span class="text-[9px] bg-[#222] px-2 py-0.5 rounded text-gray-400 font-bold uppercase">${i.cate}</span>
                                <span class="text-[9px] text-pink-400 font-bold uppercase">${i.prio}</span>
                            </div>
-                           ${i.note ? `<div class="text-[10px] text-gray-400 mt-2 bg-black/40 p-2 rounded-lg border border-white/5 italic">${i.note}</div>` : ''}
+                           ${i.note ? `<div class="text-[10px] text-gray-400 mt-2 bg-black/40 p-2 rounded-lg border border-white/5 italic">📝 ${i.note}</div>` : ''}
                            ${i.link ? `<a href="${i.link}" target="_blank" class="text-pink-500 text-[10px] underline mt-3 block font-bold uppercase tracking-tight">🔗 Link sản phẩm</a>` : ''}
                        </div>
                        <div class="text-yellow-500 font-bold text-sm ml-2">${Number(i.price).toLocaleString()}đ</div>
@@ -120,11 +147,16 @@
                    </div>
                </div>`;
            });
+
            if (lastAddedId) {
                setTimeout(() => {
                    const el = document.getElementById(`item-${lastAddedId}`);
-                   if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('new-item-glow'); lastAddedId = null; }
-               }, 100);
+                   if (el) {
+                       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                       el.classList.add('new-item-glow');
+                       lastAddedId = null;
+                   }
+               }, 300);
            }
        });
    </script>
@@ -133,12 +165,12 @@
    <div class="max-w-md mx-auto">
        <div class="text-center mb-10 pt-6">
            <h1 class="text-2xl font-black text-pink-500 uppercase tracking-tighter">🌹 Wishlist Của Bòi Bói Boi 🫄</h1>
-           <p class="text-gray-400 text-xs italic mt-2">Thêm món quà anh thích vào đây nhoéeee💌</p>
+           <p class="text-gray-400 text-xs italic mt-2">Thêm món quà anh thích vào đây nhoéee💌/p>
        </div>
        <div class="bg-[#161616] p-7 rounded-[40px] border border-white/5 space-y-6 shadow-2xl">
            <div>
-               <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">💖 Tên quà tặng</p>
-               <input id="gName" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent" placeholder="VD: Tay cầm PS5, Giày đá bóng...">
+               <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">💖 Tên quà tặng (Bắt buộc)</p>
+               <input id="gName" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent transition-all" placeholder="Nhập tên món quà...">
            </div>
            <div>
                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🏷️ Danh mục</p>
@@ -151,16 +183,16 @@
            </div>
            <div>
                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">💰 Giá ước tính (VNĐ)</p>
-               <input id="gPrice" type="text" oninput="formatCurrency(this)" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent font-mono" placeholder="VD: 1,500,000">
+               <input id="gPrice" type="text" oninput="formatCurrency(this)" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent font-mono" placeholder="Ví dụ: 1,500,000">
            </div>
            <div>
                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🔗 Link tham khảo</p>
-               <input id="gLink" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent" placeholder="Dán link sản phẩm Shopee, Lazada...">
+               <input id="gLink" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent" placeholder="Dán link sản phẩm...">
            </div>
            <div>
                <p class="text-pink-300 text-[9px] font-bold mb-3 uppercase tracking-widest">Độ ưu tiên</p>
                <div class="grid grid-cols-5 gap-1.5">
-                   <button onclick="selectPrio('Fomo', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">💬<bt>Fomo</bt></button>
+                   <button onclick="selectPrio('Ước thôi', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">💬<br>Ước thôi</button>
                    <button onclick="selectPrio('Thích nha', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">🌹<br>Thích nha</button>
                    <button onclick="selectPrio('Muốn lắm', this)" class="prio-btn py-3 rounded-xl border border-pink-500 bg-[#3a2226] text-[8px] text-white flex flex-col items-center shadow-lg">🥺<br>Muốn lắm</button>
                    <button onclick="selectPrio('Cần rồi', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">💕<br>Cần rồi</button>
@@ -169,7 +201,7 @@
            </div>
            <div>
                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🗒️ Ghi chú chi tiết</p>
-               <input id="gNote" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent" placeholder="Ví dụ: Màu đen, Size XL, Bản quốc tế...">
+               <input id="gNote" class="w-full bg-[#222] p-4 rounded-2xl outline-none text-sm text-white focus:border-pink-500 border border-transparent" placeholder="Màu sắc, kích thước, lưu ý thêm...">
            </div>
            <button id="mainAddBtn" onclick="addGift()" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 py-6 rounded-[35px] font-bold text-sm shadow-xl mt-4 uppercase tracking-[0.2em] text-white">
                + Thêm món quà ❤️
