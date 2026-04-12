@@ -101,17 +101,25 @@ const scrollToNewItem = (itemId, isFoodTab) => {
         window.addGift = (btn) => {
     const name = document.getElementById('giftName').value;
     const price = document.getElementById('giftPrice').value;
+    const category = document.getElementById('category').value;
+    const note = document.getElementById('giftNote').value;
+
     if (!name || !price) return alert("Nhập đủ tên và giá!");
 
     const newRef = push(wishlistRef, {
-        name, 
+        name: name,
+        price: price,
+        category: category,
+        note: note,
         priority: selectedPriority,
+        status: 'pending',
         createdAt: Date.now()
     });
 
     triggerGiftBurst();
     document.getElementById('giftName').value = "";
     document.getElementById('giftPrice').value = "";
+    document.getElementById('giftNote').value = "";
     
     scrollToNewItem(newRef.key, false); 
 };
@@ -133,6 +141,19 @@ window.addFood = (btn) => {
 
     scrollToNewItem(newRef.key, true); 
 };
+onValue(wishlistRef, (snapshot) => {
+    const container = document.getElementById('wishlistContainer');
+    container.innerHTML = "";
+    const data = snapshot.val();
+    if (data) {
+        const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        items.sort((a, b) => (b.priority - a.priority) || (b.createdAt - a.createdAt));
+        items.forEach(item => {
+            const labels = ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
+            container.insertAdjacentHTML('beforeend', renderItem(item, labels, 'updateStatus', 'deleteItem', false));
+        });
+    }
+});
 
         onValue(foodRef, (snapshot) => {
             const container = document.getElementById('foodListContainer');
