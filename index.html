@@ -149,27 +149,9 @@ window.addFood = (btn) => {
         });
 
         function renderItem(item, labels, statusFn, deleteFn, isFood) {
-            const isBought = item.status === 'bought';
-            return `
-                  <div id="item-${item.id}" class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
-
-                    <div class="flex justify-between items-center">
-                        <div class="flex-1 pr-3">
-                            <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority, isFood)}">
-                                ${labels[item.priority]}
-                            </span>
-                            <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : (isFood ? 'text-orange-100' : 'text-pink-100')}">${item.name}</h3>
-                            <p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">${isFood ? '😋' : '💕'} ${item.category} • ${item.price}đ</p>
-                            ${item.image ? `<img src="${item.image}" class="mt-4 rounded-3xl w-full h-48 object-cover border border-zinc-800 shadow-2xl">` : ''}
-                            ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Ghi chú: ${item.note}</p>` : ''}
-                        </div>
-                        <div class="flex flex-col gap-4">
-                            <button onclick="${statusFn}('${item.id}', '${isBought ? 'pending' : 'bought'}')" class="w-14 h-14 ${isBought ? 'bg-green-500' : 'bg-zinc-900'} border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">${isFood ? '🤤' : '💃'}</button>
-                            <button onclick="${deleteFn}('${item.id}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">🗑️</button>
-                        </div>
-                    </div>
-                </div>`;
-        }
+    const isBought = item.status === 'bought';
+    return `<div id="item-${item.id}" class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}"><div class="flex justify-between items-start"><div class="flex-1 pr-3"><div class="flex items-center gap-2 mb-3"><span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority, isFood)}">${labels[item.priority]}</span></div><h3 class="font-bold text-xl ${isBought ? 'line-through text-zinc-600' : (isFood ? 'text-orange-100' : 'text-pink-100')}">${item.name}</h3><p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">${isFood ? '😋' : '💕'} ${item.category} • ${item.price}đ</p></div><div class="flex flex-col gap-4"><button onclick="${statusFn}('${item.id}', '${isBought ? 'pending' : 'bought'}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl">${isFood ? '🤤' : '💃'}</button><button onclick="${deleteFn}('${item.id}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl">🗑️</button></div></div></div>`;
+}
 
         window.deleteItem = (id) => { if(confirm("Xoá món quà này nhé?")) remove(ref(db, `gifts/${id}`)); };
         window.updateStatus = (id, status) => update(ref(db, `gifts/${id}`), { status });
