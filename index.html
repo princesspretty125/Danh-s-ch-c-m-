@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist Realtime Final 🧞‍♀️</title>
+    <title>Wishlist Realtime 🧞‍♀️</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -17,8 +17,7 @@
         label { font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 10px; display: block; text-transform: uppercase; }
         input, textarea { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; }
         .select-wrapper { position: relative; width: 100%; }
-        select { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: none; -webkit-appearance: none; }
-        .select-wrapper::after { content: '▼'; position: absolute; right: 15px; top: 18px; color: var(--pink); font-size: 12px; pointer-events: none; }
+        select { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: auto !important; -webkit-appearance: auto !important; }
         textarea { height: 60px; resize: none; font-family: inherit; }
         .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
         .p-group { display: flex; flex-direction: column; gap: 10px; }
@@ -29,18 +28,17 @@
         .list-container { width: 100%; max-width: 400px; padding-bottom: 50px; }
         h2 { font-size: 18px; font-weight: 900; margin: 40px 0 20px; padding-left: 10px; border-left: 4px solid var(--pink); }
         .card { background: var(--card); border-radius: 30px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; }
-        .new-item-flash { animation: flash-brilliant 1s ease-in-out 3; }
-        @keyframes flash-brilliant { 0% { border-color: #2c2c2e; } 50% { border-color: var(--pink); box-shadow: 0 0 20px var(--pink); background: #222; } 100% { border-color: #2c2c2e; } }
+        .new-item-flash { animation: flash-brilliant 1.5s ease-in-out; }
+        @keyframes flash-brilliant { 0% { border-color: #2c2c2e; } 50% { border-color: var(--pink); box-shadow: 0 0 20px var(--pink); } 100% { border-color: #2c2c2e; } }
         .card.is-done { opacity: 0.3; filter: grayscale(1); }
         .info h3 { margin: 0; font-size: 18px; font-weight: 800; }
         .info p { margin: 5px 0 0; font-size: 12px; color: var(--gray); }
-        .info .note-txt { color: var(--pink); font-size: 11px; margin-top: 5px; font-style: italic; }
         .badge { font-size: 9px; padding: 4px 12px; border-radius: 12px; font-weight: 800; margin-bottom: 8px; display: inline-block; }
-        .p6 { background: rgba(255, 59, 48, 0.2); color: #ff3b30; } 
-        .p5 { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; } 
-        .p4 { background: rgba(48, 209, 88, 0.2); color: #30d158; } 
-        .p3 { background: rgba(10, 132, 255, 0.2); color: #0a84ff; } 
-        .p2 { background: rgba(242, 162, 192, 0.2); color: #f2a2c0; } 
+        .p6 { background: rgba(255,59,48,0.2); color: #ff3b30; } 
+        .p5 { background: rgba(255,159,10,0.2); color: #ff9f0a; } 
+        .p4 { background: rgba(48,209,88,0.2); color: #30d158; } 
+        .p3 { background: rgba(10,132,255,0.2); color: #0a84ff; } 
+        .p2 { background: rgba(242,162,192,0.2); color: #f2a2c0; } 
         .circle-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #2c2c2e; background: #1c1c1e; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
     </style>
 </head>
@@ -51,15 +49,13 @@
         <label>❤️ TÊN QUÀ TẶNG</label>
         <input type="text" id="itemName" placeholder="Nhập tên món...">
         <div class="row">
-            <div class="select-wrapper">
-                <select id="itemCate">
-                    <option value="👩‍❤️‍👨 Quà đôi">👩‍❤️‍👨 Quà đôi</option>
-                    <option value="⚽ Thể thao">⚽ Thể thao</option>
-                    <option value="👕 Thời trang">👕 Thời trang</option>
-                    <option value="💻 Công nghệ">💻 Công nghệ</option>
-                    <option value="🍔 Ăn uống">🍔 Ăn uống</option>
-                </select>
-            </div>
+            <select id="itemCate">
+                <option value="👩‍❤️‍👨 Quà đôi">👩‍❤️‍👨 Quà đôi</option>
+                <option value="⚽ Thể thao">⚽ Thể thao</option>
+                <option value="👕 Thời trang">👕 Thời trang</option>
+                <option value="💻 Công nghệ">💻 Công nghệ</option>
+                <option value="🍔 Ăn uống">🍔 Ăn uống</option>
+            </select>
             <input type="text" id="itemPrice" placeholder="Giá" onkeyup="fVND(this)">
         </div>
         <label>📝 GHI CHÚ</label>
@@ -94,7 +90,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let curP = null;
-    let lastKey = "";
+    let lastId = "";
 
     function fVND(i) {
         let v = i.value.replace(/\D/g, "");
@@ -110,17 +106,17 @@
         const price = document.getElementById('itemPrice').value;
         const cate = document.getElementById('itemCate').value;
         const note = document.getElementById('itemNote').value;
-        if (!name || !curP) return alert("Bà chọn độ ưu tiên đã!");
+        if (!name || !curP) return alert("Chọn độ ưu tiên!");
 
-        const rect = document.getElementById('submitBtn').getBoundingClientRect();
+        const btn = document.getElementById('submitBtn');
+        const rect = btn.getBoundingClientRect();
         const x = (rect.left + rect.width / 2) / window.innerWidth;
         const y = (rect.top + rect.height / 2) / window.innerHeight;
-
         const shapes = ['🎁', '💖', '🔥', '⭐', '🎉'].map(t => confetti.shapeFromText({ text: t, scalar: 3 }));
         confetti({ particleCount: 300, spread: 100, origin: { x, y }, shapes });
 
         const ref = db.ref('wishlist_v1').push();
-        lastKey = ref.key;
+        lastId = ref.key;
         ref.set({ name, price: price || "0", cate, note, priority: curP, status: 'waiting', time: Date.now() });
 
         document.getElementById('itemName').value = "";
@@ -128,19 +124,10 @@
         document.getElementById('itemNote').value = "";
         document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
         curP = null;
-
-        setTimeout(() => {
-            const el = document.getElementById(lastKey);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.classList.add('new-item-flash');
-            }
-        }, 100);
     }
     function toggleStatus(id, s) {
         const next = s === 'waiting' ? 'done' : 'waiting';
         db.ref('wishlist_v1/' + id).update({ status: next });
-        if(next === 'done') confetti({ particleCount: 150, origin: { y: 0.8 }, shapes: [confetti.shapeFromText({ text: '✅', scalar: 2 })] });
     }
     db.ref('wishlist_v1').on('value', (snap) => {
         const aBox = document.getElementById('activeList');
@@ -151,11 +138,30 @@
         items.sort((a, b) => b.priority.lv - a.priority.lv || b.time - a.time);
         items.forEach(i => {
             const isD = i.status === 'done';
-            const h = `<div class="card ${isD ? 'is-done' : ''} ${i.id === lastKey ? 'new-item-flash' : ''}" id="${i.id}"><div class="info"><span class="badge p${i.priority.lv}">${i.priority.txt}</span><h3>${i.name}</h3><p>${i.cate} • 💰 ${i.price}đ</p>${i.note ? `<p class="note-txt">📝 ${i.note}</p>` : ''}</div><div class="actions"><button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button><button class="circle-btn" onclick="confirm('Xóa?') && db.ref('wishlist_v1/${i.id}').remove()">🗑️</button></div></div>`;
+            const h = `<div class="card ${isD ? 'is-done' : ''} ${i.id === lastId ? 'new-item-flash' : ''}" id="${i.id}">
+                <div class="info">
+                    <span class="badge p${i.priority.lv}">${i.priority.txt}</span>
+                    <h3>${i.name}</h3>
+                    <p>${i.cate} • 💰 ${i.price}đ</p>
+                    ${i.note ? `<p style="color:var(--pink);font-size:11px;margin-top:5px;">📝 ${i.note}</p>` : ''}
+                </div>
+                <div class="actions" style="display:flex;gap:10px;">
+                    <button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button>
+                    <button class="circle-btn" onclick="confirm('Xóa?') && db.ref('wishlist_v1/${i.id}').remove()">🗑️</button>
+                </div>
+            </div>`;
             if(isD) dH += h; else aH += h;
         });
-        aBox.innerHTML = aH || "...";
-        dBox.innerHTML = dH || "...";
+        aBox.innerHTML = aH || "<p style='text-align:center;color:#333;'>Chưa có món nào...</p>";
+        dBox.innerHTML = dH || "<p style='text-align:center;color:#333;'>Chưa hốt được gì...</p>";
+        
+        if (lastId) {
+            const el = document.getElementById(lastId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => { lastId = ""; }, 2000);
+            }
+        }
     });
 </script>
 </body>
