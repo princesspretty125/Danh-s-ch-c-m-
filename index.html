@@ -117,10 +117,17 @@ const scrollToNewItem = (itemId, isFoodTab) => {
     });
 
     triggerGiftBurst();
+        // Dọn dẹp sạch sẽ form Wishlist
     document.getElementById('giftName').value = "";
     document.getElementById('giftPrice').value = "";
     document.getElementById('giftNote').value = "";
+    document.getElementById('category').selectedIndex = 0;
     
+    // Đưa độ ưu tiên về mức 1 (màu hồng)
+    selectedPriority = 1; 
+    document.querySelectorAll('.gift-priority-btn').forEach(btn => btn.classList.remove('active-priority'));
+    document.getElementById('priority-1').classList.add('active-priority');
+
     scrollToNewItem(newRef.key, false); 
 };
 
@@ -142,12 +149,20 @@ window.addFood = (btn) => {
     });
 
     triggerGiftBurst();
-    // Reset form sau khi thêm
+        // Dọn dẹp sạch sẽ form Foodlist
     document.getElementById('foodName').value = "";
     document.getElementById('foodPrice').value = "";
+    document.getElementById('foodCategory').selectedIndex = 0;
+    
+    // Xóa ảnh cũ
     document.getElementById('previewImg').classList.add('hidden');
     document.getElementById('cameraIcon').classList.remove('hidden');
-    foodImageBase64 = ""; // Xóa ảnh cũ để lần sau chọn ảnh mới
+    foodImageBase64 = ""; 
+
+    // Đưa độ thèm về mức 1 (màu cam)
+    foodPriority = 1;
+    document.querySelectorAll('.food-priority-btn').forEach(btn => btn.classList.remove('active-food-priority'));
+    document.getElementById('food-priority-1').classList.add('active-food-priority');
 
     scrollToNewItem(newRef.key, true); 
 };
