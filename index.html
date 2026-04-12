@@ -13,20 +13,23 @@
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
-  authDomain: "wishlist-c5669.firebaseapp.com",
-  databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "wishlist-c5669",
-  storageBucket: "wishlist-c5669.firebasestorage.app",
-  messagingSenderId: "821194575297",
-  appId: "1:821194575297:web:185b7837e6cdee4783f340",
-  measurementId: "G-RHE1QBW9WX"
+            authDomain: "wishlist-c5669.firebaseapp.com",
+            databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "wishlist-c5669",
+            storageBucket: "wishlist-c5669.firebasestorage.app",
+            messagingSenderId: "821194575297",
+            appId: "1:821194575297:web:185b7837e6cdee4783f340",
+            measurementId: "G-RHE1QBW9WX"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const wishlistRef = ref(db, 'gifts');
+        const foodRef = ref(db, 'foods');
 
         let selectedPriority = 1; 
+        let foodPriority = 1;
+        let foodImageBase64 = "";
 
         const getPriorityStyle = (priority) => {
             switch (priority) {
@@ -41,14 +44,39 @@
 
         window.selectPriority = (val) => {
             selectedPriority = val;
-            document.querySelectorAll('.priority-btn').forEach(btn => btn.classList.remove('active-priority'));
+            document.querySelectorAll('.gift-priority-btn').forEach(btn => btn.classList.remove('active-priority'));
             document.getElementById('priority-' + val).classList.add('active-priority');
+        };
+
+        window.selectFoodPriority = (val) => {
+            foodPriority = val;
+            document.querySelectorAll('.food-priority-btn').forEach(btn => btn.classList.remove('active-priority'));
+            document.getElementById('food-priority-' + val).classList.add('active-priority');
         };
 
         document.getElementById('giftPrice').addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, "");
             e.target.value = new Intl.NumberFormat('en-US').format(value);
         });
+
+        document.getElementById('foodPrice').addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            e.target.value = new Intl.NumberFormat('en-US').format(value);
+        });
+
+        window.handleImageUpload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    foodImageBase64 = event.target.result;
+                    document.getElementById('previewImg').src = foodImageBase64;
+                    document.getElementById('previewImg').classList.remove('hidden');
+                    document.getElementById('cameraIcon').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
 
         window.addGift = (btn) => {
             const name = document.getElementById('giftName').value;
@@ -69,26 +97,38 @@
             });
 
             triggerGiftBurst();
-
             document.getElementById('giftName').value = "";
             document.getElementById('giftPrice').value = "";
             document.getElementById('giftNote').value = "";
             document.getElementById('category').selectedIndex = 0;
             selectPriority(1); 
+        };
 
-            setTimeout(() => {
-                const firstItem = document.querySelector('#wishlistContainer > div:first-child');
-                if (firstItem) {
-                    firstItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    firstItem.style.transition = "all 0.6s ease";
-                    firstItem.style.boxShadow = "0 0 40px rgba(244, 114, 182, 0.7)";
-                    firstItem.style.borderColor = "#f472b6";
-                    setTimeout(() => {
-                        firstItem.style.boxShadow = "none";
-                        firstItem.style.borderColor = "#27272a"; 
-                    }, 2500);
-                }
-            }, 600);
+        window.addFood = (btn) => {
+            const name = document.getElementById('foodName').value;
+            const category = document.getElementById('foodCategory').value;
+            const price = document.getElementById('foodPrice').value;
+
+            if (!name || !price) return alert("Nhập đủ tên món nhé!");
+
+            btn.classList.add('btn-bounce-glow');
+            setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
+
+            push(foodRef, {
+                name, category, price,
+                image: foodImageBase64,
+                priority: foodPriority,
+                status: 'pending',
+                createdAt: Date.now()
+            });
+
+            triggerGiftBurst();
+            document.getElementById('foodName').value = "";
+            document.getElementById('foodPrice').value = "";
+            document.getElementById('previewImg').classList.add('hidden');
+            document.getElementById('cameraIcon').classList.remove('hidden');
+            foodImageBase64 = "";
+            selectFoodPriority(1);
         };
 
         onValue(wishlistRef, (snapshot) => {
@@ -98,34 +138,77 @@
             if (data) {
                 const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 items.sort((a, b) => (b.priority !== a.priority) ? (b.priority - a.priority) : (b.createdAt - a.createdAt));
-
                 items.forEach(item => {
                     const isBought = item.status === 'bought';
                     const labels = ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
-                    const html = `
-                        <div class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
-                            <div class="flex justify-between items-center">
-                                <div class="flex-1 pr-3">
-                                    <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority)}">
-                                        ${labels[item.priority]}
-                                    </span>
-                                    <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : 'text-pink-100'}">${item.name}</h3>
-                                    <p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">💕 ${item.category} • ${item.price}đ</p>
-                                    ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Ghi chú: ${item.note}</p>` : ''}
-                                </div>
-                                <div class="flex flex-col gap-4">
-                                    <button onclick="updateStatus('${item.id}', '${isBought ? 'pending' : 'bought'}')" class="w-14 h-14 ${isBought ? 'bg-green-500' : 'bg-zinc-900'} border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">💃</button>
-                                    <button onclick="deleteItem('${item.id}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">🗑️</button>
-                                </div>
-                            </div>
-                        </div>`;
-                    container.insertAdjacentHTML('beforeend', html);
+                    container.insertAdjacentHTML('beforeend', renderItem(item, isBought, labels, 'updateStatus', 'deleteItem'));
                 });
             }
         });
 
+        onValue(foodRef, (snapshot) => {
+            const container = document.getElementById('foodListContainer');
+            container.innerHTML = "";
+            const data = snapshot.val();
+            if (data) {
+                const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                items.sort((a, b) => (b.priority !== a.priority) ? (b.priority - a.priority) : (b.createdAt - a.createdAt));
+                items.forEach(item => {
+                    const isBought = item.status === 'bought';
+                    const labels = ["", "🍜 Thử cho biết", "🍕 Khá thèm", "🍔 Rất đói", "🍣 Ghiền quá", "🔥 THÈM CHẾT MẤT"];
+                    container.insertAdjacentHTML('beforeend', renderItem(item, isBought, labels, 'updateFoodStatus', 'deleteFoodItem', true));
+                });
+            }
+        });
+
+        function renderItem(item, isBought, labels, statusFn, deleteFn, isFood = false) {
+            return `
+                <div class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1 pr-3">
+                            <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority)}">
+                                ${labels[item.priority]}
+                            </span>
+                            <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : 'text-pink-100'}">${item.name}</h3>
+                            <p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">${isFood ? '😋' : '💕'} ${item.category} • ${item.price}đ</p>
+                            ${item.image ? `<img src="${item.image}" class="mt-3 rounded-2xl w-full h-40 object-cover border border-zinc-800">` : ''}
+                            ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Ghi chú: ${item.note}</p>` : ''}
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <button onclick="${statusFn}('${item.id}', '${isBought ? 'pending' : 'bought'}')" class="w-14 h-14 ${isBought ? 'bg-green-500' : 'bg-zinc-900'} border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">${isFood ? '🤤' : '💃'}</button>
+                            <button onclick="${deleteFn}('${item.id}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">🗑️</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
         window.deleteItem = (id) => { if(confirm("Xoá món quà này nhé?")) remove(ref(db, `gifts/${id}`)); };
         window.updateStatus = (id, status) => update(ref(db, `gifts/${id}`), { status });
+        window.deleteFoodItem = (id) => { if(confirm("Xoá món này khỏi menu nhé?")) remove(ref(db, `foods/${id}`)); };
+        window.updateFoodStatus = (id, status) => update(ref(db, `foods/${id}`), { status });
+        
+        window.switchTab = (tab) => {
+            const giftTab = document.getElementById('tab-gifts');
+            const foodTab = document.getElementById('tab-foods');
+            const btnGift = document.getElementById('btn-tab-gift');
+            const btnFood = document.getElementById('btn-tab-food');
+            
+            if(tab === 'gifts') {
+                giftTab.classList.remove('hidden');
+                foodTab.classList.add('hidden');
+                btnGift.classList.add('bg-pink-600', 'text-white');
+                btnGift.classList.remove('bg-zinc-900', 'text-zinc-500');
+                btnFood.classList.add('bg-zinc-900', 'text-zinc-500');
+                btnFood.classList.remove('bg-pink-600', 'text-white');
+            } else {
+                giftTab.classList.add('hidden');
+                foodTab.classList.remove('hidden');
+                btnFood.classList.add('bg-pink-600', 'text-white');
+                btnFood.classList.remove('bg-zinc-900', 'text-zinc-500');
+                btnGift.classList.add('bg-zinc-900', 'text-zinc-500');
+                btnGift.classList.remove('bg-pink-600', 'text-white');
+            }
+        };
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
@@ -141,75 +224,127 @@
         @keyframes bounceGlow { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(244, 114, 182, 0.5); } 100% { transform: scale(1); } }
         .gift-box { position: fixed; font-size: 35px; pointer-events: none; z-index: 9999; }
         select { -webkit-appearance: none; appearance: none; }
+        .tab-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4 pb-24">
     <div class="w-full max-w-md">
-        <div class="text-center my-12">
-            <h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi🫃🏻</h1>
-            <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee💌</p>
+        <div class="flex justify-center gap-3 mb-8">
+            <button id="btn-tab-gift" onclick="switchTab('gifts')" class="tab-btn flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-pink-600 text-white shadow-lg">🎁 Wishlist</button>
+            <button id="btn-tab-food" onclick="switchTab('foods')" class="tab-btn flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-zinc-900 text-zinc-500 shadow-lg">🍜 Foodlist</button>
         </div>
 
-        <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
-            <div class="space-y-6">
-                <div>
-                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">❤️ Tên quà tặng</label>
-                    <input type="text" id="giftName" placeholder="Tên món quà..." class="w-full p-4.5 rounded-2xl mt-2 text-sm">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="relative">
-                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🏷️ Danh mục</label>
-                        <select id="category" class="w-full p-4.5 rounded-2xl mt-2 text-sm appearance-none pr-10">
-                            <option value="💕 Lãng Mạn">💕 Lãng Mạn</option>
-                            <option value="🎮 Công Nghệ">🎮 Công Nghệ</option>
-                            <option value="👕 Thời Trang">👕 Thời Trang</option>
-                            <option value="⚽ Thể Thao">⚽ Thể Thao</option>
-                        </select>
-                        <i class="fas fa-chevron-down absolute right-4 bottom-5 text-zinc-700 text-[10px]"></i>
-                    </div>
+        <div id="tab-gifts">
+            <div class="text-center my-12">
+                <h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi🫃🏻</h1>
+                <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee💌</p>
+            </div>
+
+            <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
+                <div class="space-y-6">
                     <div>
-                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá (VNĐ)</label>
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">❤️ Tên quà tặng</label>
+                        <input type="text" id="giftName" placeholder="Tên món quà..." class="w-full p-4.5 rounded-2xl mt-2 text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
                         <div class="relative">
-                            <input type="text" id="giftPrice" placeholder="500,000" class="w-full p-4.5 rounded-2xl mt-2 text-sm font-bold pr-10">
-                            <span class="absolute right-4 bottom-4.5 text-zinc-600 font-bold">đ</span>
+                            <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🏷️ Danh mục</label>
+                            <select id="category" class="w-full p-4.5 rounded-2xl mt-2 text-sm appearance-none pr-10">
+                                <option value="💕 Lãng Mạn">💕 Lãng Mạn</option>
+                                <option value="🎮 Công Nghệ">🎮 Công Nghệ</option>
+                                <option value="👕 Thời Trang">👕 Thời Trang</option>
+                                <option value="⚽ Thể Thao">⚽ Thể Thao</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 bottom-5 text-zinc-700 text-[10px]"></i>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá (VNĐ)</label>
+                            <div class="relative">
+                                <input type="text" id="giftPrice" placeholder="500,000" class="w-full p-4.5 rounded-2xl mt-2 text-sm font-bold pr-10">
+                                <span class="absolute right-4 bottom-4.5 text-zinc-600 font-bold">đ</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest mb-3 block">🔥 Độ ưu tiên</label>
-                    <div class="grid grid-cols-1 gap-2">
-                        <button onclick="selectPriority(1)" id="priority-1" class="priority-btn p-4 rounded-2xl active-priority italic">💬 FOMO</button>
-                        <button onclick="selectPriority(2)" id="priority-2" class="priority-btn p-4 rounded-2xl italic">🌷 Thích nha</button>
-                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn p-4 rounded-2xl italic">🙄 Muốn lắm</button>
-                        <button onclick="selectPriority(4)" id="priority-4" class="priority-btn p-4 rounded-2xl italic">💕 Cần rồi</button>
-                        <button onclick="selectPriority(5)" id="priority-5" class="priority-btn p-4 rounded-2xl italic text-red-500">🔥 PHẢI CÓ</button>
+                    <div>
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest mb-3 block">🔥 Độ ưu tiên</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button onclick="selectPriority(1)" id="priority-1" class="priority-btn gift-priority-btn p-4 rounded-2xl active-priority italic">💬 FOMO</button>
+                            <button onclick="selectPriority(2)" id="priority-2" class="priority-btn gift-priority-btn p-4 rounded-2xl italic">🌷 Thích nha</button>
+                            <button onclick="selectPriority(3)" id="priority-3" class="priority-btn gift-priority-btn p-4 rounded-2xl italic">🙄 Muốn lắm</button>
+                            <button onclick="selectPriority(4)" id="priority-4" class="priority-btn gift-priority-btn p-4 rounded-2xl italic">💕 Cần rồi</button>
+                            <button onclick="selectPriority(5)" id="priority-5" class="priority-btn gift-priority-btn p-4 rounded-2xl italic text-red-500">🔥 PHẢI CÓ</button>
+                        </div>
                     </div>
+                    <div>
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📝 Ghi chú chi tiết</label>
+                        <textarea id="giftNote" placeholder="Size, màu sắc..." class="w-full p-4.5 rounded-2xl mt-2 text-sm h-28 resize-none font-medium"></textarea>
+                    </div>
+                    <button onclick="addGift(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">🚀 THÊM VÀO WISHLIST 💖</button>
                 </div>
-
-                <div>
-                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📝 Ghi chú chi tiết</label>
-                    <textarea id="giftNote" placeholder="Size, màu sắc, cấu hình hoặc dán link sản phẩm vào đây..." class="w-full p-4.5 rounded-2xl mt-2 text-sm h-28 resize-none font-medium"></textarea>
-                </div>
-
-                <button onclick="addGift(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">
-                    🚀 THÊM VÀO WISHLIST 💖
-                </button>
             </div>
+            <div id="wishlistContainer" class="space-y-5"></div>
         </div>
 
-        <div class="flex items-center gap-4 mb-10 px-2">
-            <h2 class="text-xl font-black text-pink-200 italic">Danh sách ước mơ 🧚🏻‍♂️</h2>
-            <div class="h-[1px] flex-1 bg-zinc-900"></div>
+        <div id="tab-foods" class="hidden">
+            <div class="text-center my-12">
+                <h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Foodlist Toàn Món Ngon🤤</h1>
+                <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thèm gì thì cứ mạnh dạn thêm vào đêêê🍕</p>
+            </div>
+            <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🍱 Tên món ăn</label>
+                            <input type="text" id="foodName" placeholder="Tên món gì ngon..." class="w-full p-4.5 rounded-2xl mt-2 text-sm">
+                        </div>
+                        <div class="w-24">
+                            <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📸 Ảnh</label>
+                            <label class="w-full h-[52px] mt-2 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
+                                <i id="cameraIcon" class="fas fa-camera text-zinc-500"></i>
+                                <img id="previewImg" class="w-full h-full object-cover hidden">
+                                <input type="file" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🥨 Loại đồ ăn</label>
+                            <select id="foodCategory" class="w-full p-4.5 rounded-2xl mt-2 text-sm appearance-none pr-10">
+                                <option value="🥘 Đồ Mặn">🥘 Đồ Mặn</option>
+                                <option value="🍦 Tráng Miệng">🍦 Tráng Miệng</option>
+                                <option value="🧋 Trà Sữa">🧋 Trà Sữa</option>
+                                <option value="🍿 Ăn Vặt">🍿 Ăn Vặt</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 bottom-5 text-zinc-700 text-[10px]"></i>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá (Dự kiến)</label>
+                            <div class="relative">
+                                <input type="text" id="foodPrice" placeholder="100,000" class="w-full p-4.5 rounded-2xl mt-2 text-sm font-bold pr-10">
+                                <span class="absolute right-4 bottom-4.5 text-zinc-600 font-bold">đ</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest mb-3 block">🔥 Độ thèm thuồng</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button onclick="selectFoodPriority(1)" id="food-priority-1" class="priority-btn food-priority-btn p-4 rounded-2xl active-priority italic">🍜 Thử cho biết</button>
+                            <button onclick="selectFoodPriority(2)" id="food-priority-2" class="priority-btn food-priority-btn p-4 rounded-2xl italic">🍕 Khá thèm</button>
+                            <button onclick="selectFoodPriority(3)" id="food-priority-3" class="priority-btn food-priority-btn p-4 rounded-2xl italic">🍔 Rất đó đói</button>
+                            <button onclick="selectFoodPriority(4)" id="food-priority-4" class="priority-btn food-priority-btn p-4 rounded-2xl italic">🍣 Ghiền quá</button>
+                            <button onclick="selectFoodPriority(5)" id="food-priority-5" class="priority-btn food-priority-btn p-4 rounded-2xl italic text-red-500">🔥 THÈM CHẾT MẤT</button>
+                        </div>
+                    </div>
+                    <button onclick="addFood(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">🚀 CHỐT ĐƠN ĐI ĂN THÔI 💖</button>
+                </div>
+            </div>
+            <div id="foodListContainer" class="space-y-5"></div>
         </div>
-
-        <div id="wishlistContainer" class="space-y-5"></div>
     </div>
 
     <script>
         function triggerGiftBurst() {
-            const icons = ['🎁', '💃', '✨', '💖', '💍', '🧸'];
+            const icons = ['🎁', '💃', '✨', '💖', '💍', '🧸', '🍜', '🍕', '🍣'];
             for (let i = 0; i < 20; i++) {
                 const b = document.createElement('div');
                 b.className = 'gift-box';
@@ -226,3 +361,4 @@
     </script>
 </body>
 </html>
+
