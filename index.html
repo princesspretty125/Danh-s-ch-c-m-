@@ -86,79 +86,50 @@
                 reader.readAsDataURL(file);
             }
         };
-const scrollToNewItem = (containerId) => {
+const scrollToNewItem = (itemId) => {
     setTimeout(() => {
-        const container = document.getElementById(containerId);
-        const firstItem = container.querySelector('div:first-child');
-        if (firstItem) {
-            firstItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            const color = containerId === 'wishlistContainer' ? "#f472b6" : "#f59e0b";
-            firstItem.style.transition = "all 0.8s ease";
-            firstItem.style.boxShadow = `0 0 40px ${color}`;
-            setTimeout(() => { firstItem.style.boxShadow = "none"; }, 2000);
+        const newItem = document.getElementById(`item-${itemId}`);
+        if (newItem) {
+            newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            newItem.style.transition = "all 0.8s ease";
+            newItem.style.boxShadow = "0 0 40px #f472b6";
+            setTimeout(() => { newItem.style.boxShadow = "none"; }, 2000);
         }
     }, 600);
 };
         window.addGift = (btn) => {
-            const name = document.getElementById('giftName').value;
-            const category = document.getElementById('category').value;
-            const price = document.getElementById('giftPrice').value;
-            const note = document.getElementById('giftNote').value;
-            if (!name || !price) return alert("Nhập đủ tên nhé!");
-            btn.classList.add('btn-bounce-glow');
-            setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
-            push(wishlistRef, {
-                name, category, price, note,
-                priority: selectedPriority,
-                status: 'pending',
-                createdAt: Date.now()
-            });
-            triggerGiftBurst();
-            document.getElementById('giftName').value = "";
-            document.getElementById('giftPrice').value = "";
-            document.getElementById('giftNote').value = "";
-            document.getElementById('category').selectedIndex = 0;
-            selectPriority(1); 
-        scrollToNewItem('wishlistContainer');
+    const name = document.getElementById('giftName').value;
+    const price = document.getElementById('giftPrice').value;
+    if (!name || !price) return alert("Nhập đủ tên và giá!");
+
+    const newRef = push(wishlistRef, {
+        name, 
+        priority: selectedPriority,
+        createdAt: Date.now()
+    });
+
+    triggerGiftBurst();
+    document.getElementById('giftName').value = "";
+    document.getElementById('giftPrice').value = "";
+    scrollToNewItem(newRef.key); 
 };
 
-        window.addFood = (btn) => {
-            const name = document.getElementById('foodName').value;
-            const category = document.getElementById('foodCategory').value;
-            const price = document.getElementById('foodPrice').value;
-            if (!name || !price) return alert("Nhập đủ tên món nhé!");
-            btn.classList.add('btn-bounce-orange');
-            setTimeout(() => btn.classList.remove('btn-bounce-orange'), 400);
-            push(foodRef, {
-                name, category, price,
-                image: foodImageBase64,
-                priority: foodPriority,
-                status: 'pending',
-                createdAt: Date.now()
-            });
-            triggerGiftBurst();
-            document.getElementById('foodName').value = "";
-            document.getElementById('foodPrice').value = "";
-            document.getElementById('previewImg').classList.add('hidden');
-            document.getElementById('cameraIcon').classList.remove('hidden');
-            foodImageBase64 = "";
-            selectFoodPriority(1);
-        scrollToNewItem('foodListContainer');
+window.addFood = (btn) => {
+    const name = document.getElementById('foodName').value;
+    const price = document.getElementById('foodPrice').value;
+    if (!name || !price) return alert("Nhập đủ món và giá!");
+
+    const newRef = push(foodRef, {
+        name, 
+        priority: foodPriority,
+        createdAt: Date.now()
+    });
+
+    triggerGiftBurst();
+    document.getElementById('foodName').value = "";
+    document.getElementById('foodPrice').value = "";
+    scrollToNewItem(newRef.key); 
 };
-    
-        onValue(wishlistRef, (snapshot) => {
-            const container = document.getElementById('wishlistContainer');
-            container.innerHTML = "";
-            const data = snapshot.val();
-            if (data) {
-                const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                items.sort((a, b) => (b.priority - a.priority) || (b.createdAt - a.createdAt));
-                items.forEach(item => {
-                    const labels = ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
-                    container.insertAdjacentHTML('beforeend', renderItem(item, labels, 'updateStatus', 'deleteItem', false));
-                });
-            }
-        });
 
         onValue(foodRef, (snapshot) => {
             const container = document.getElementById('foodListContainer');
@@ -177,7 +148,8 @@ const scrollToNewItem = (containerId) => {
         function renderItem(item, labels, statusFn, deleteFn, isFood) {
             const isBought = item.status === 'bought';
             return `
-                <div class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
+                <div id="item-${item.id}"
+        class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
                     <div class="flex justify-between items-center">
                         <div class="flex-1 pr-3">
                             <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority, isFood)}">
