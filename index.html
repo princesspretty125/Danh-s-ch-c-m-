@@ -87,7 +87,19 @@
                 reader.readAsDataURL(file);
             }
         };
-
+const scrollToNewItem = (containerId) => {
+    setTimeout(() => {
+        const container = document.getElementById(containerId);
+        const firstItem = container.querySelector('div:first-child');
+        if (firstItem) {
+            firstItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const color = containerId === 'wishlistContainer' ? "#f472b6" : "#f59e0b";
+            firstItem.style.transition = "all 0.8s ease";
+            firstItem.style.boxShadow = `0 0 40px ${color}`;
+            setTimeout(() => { firstItem.style.boxShadow = "none"; }, 2000);
+        }
+    }, 600);
+};
         window.addGift = (btn) => {
             const name = document.getElementById('giftName').value;
             const category = document.getElementById('category').value;
@@ -108,7 +120,8 @@
             document.getElementById('giftNote').value = "";
             document.getElementById('category').selectedIndex = 0;
             selectPriority(1); 
-        };
+        scrollToNewItem('wishlistContainer');
+};
 
         window.addFood = (btn) => {
             const name = document.getElementById('foodName').value;
@@ -131,8 +144,9 @@
             document.getElementById('cameraIcon').classList.remove('hidden');
             foodImageBase64 = "";
             selectFoodPriority(1);
-        };
-
+        scrollToNewItem('foodListContainer');
+};
+    
         onValue(wishlistRef, (snapshot) => {
             const container = document.getElementById('wishlistContainer');
             container.innerHTML = "";
