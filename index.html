@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist Perfect Final 🧞‍♀️</title>
+    <title>Wishlist Final 🧞‍♀️</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -13,52 +13,39 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
         h1 { font-size: 28px; font-weight: 900; color: var(--pink); margin: 20px 0 5px; font-style: italic; text-align: center; }
         .sub { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 30px; text-align: center; }
-        
         .form-box { width: 100%; max-width: 400px; background: var(--card); border-radius: 35px; padding: 25px; box-sizing: border-box; border: 1px solid #2c2c2e; margin-bottom: 20px; }
         label { font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 10px; display: block; text-transform: uppercase; }
-        input, .select-wrapper select, textarea { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: none; font-family: inherit; }
-        textarea { height: 80px; resize: none; }
-        
+        input, .select-wrapper select, textarea { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: none; }
+        textarea { height: 60px; resize: none; font-family: inherit; }
         .select-wrapper { position: relative; }
         .select-wrapper::after { content: '▼'; font-size: 10px; color: var(--pink); position: absolute; right: 15px; top: 22px; pointer-events: none; }
         .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
-        
         .p-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
         .p-btn { background: #1c1c1e; border: 1.5px solid #2c2c2e; padding: 15px; border-radius: 20px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s; }
-        .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.1); color: var(--pink); transform: scale(1.03); }
-        
-        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 20px; border-radius: 40px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; transition: 0.2s; }
-        .add-btn:active { transform: scale(0.92); background: var(--pink); }
-
+        .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.2); color: var(--pink); transform: scale(1.03); }
+        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 20px; border-radius: 40px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; transition: 0.1s; }
+        .add-btn:active { transform: scale(0.88); background: var(--pink); }
         .list-container { width: 100%; max-width: 400px; padding-bottom: 50px; }
         h2 { font-size: 18px; font-weight: 900; margin: 40px 0 20px; padding-left: 10px; border-left: 4px solid var(--pink); }
-        
-        .card { background: var(--card); border-radius: 30px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; transition: 0.5s; }
-        .card.new-item { animation: highlight 2s ease-out; }
-        @keyframes highlight {
-            0% { border-color: var(--pink); box-shadow: 0 0 20px rgba(242, 162, 192, 0.4); transform: scale(1.05); }
-            100% { border-color: #2c2c2e; box-shadow: none; transform: scale(1); }
-        }
-
+        .card { background: var(--card); border-radius: 30px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; }
+        .card.new-item-flash { animation: flash 2s infinite; }
+        @keyframes flash { 0% { border-color: #2c2c2e; } 50% { border-color: var(--pink); box-shadow: 0 0 15px rgba(242, 162, 192, 0.4); } 100% { border-color: #2c2c2e; } }
         .card.is-done { opacity: 0.3; filter: grayscale(1); }
         .info h3 { margin: 0; font-size: 18px; font-weight: 800; }
         .info p { margin: 5px 0 0; font-size: 12px; color: var(--gray); }
-        .info .note-text { font-style: italic; color: var(--pink); font-size: 11px; margin-top: 4px; }
-        
+        .info .note-txt { color: var(--pink); font-size: 11px; margin-top: 5px; font-style: italic; }
         .badge { font-size: 9px; padding: 4px 12px; border-radius: 12px; font-weight: 800; margin-bottom: 8px; display: inline-block; }
         .p6 { background: rgba(255, 59, 48, 0.2); color: #ff3b30; } 
         .p5 { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; } 
         .p4 { background: rgba(48, 209, 88, 0.2); color: #30d158; } 
         .p3 { background: rgba(10, 132, 255, 0.2); color: #0a84ff; } 
         .p2 { background: rgba(242, 162, 192, 0.2); color: #f2a2c0; } 
-
         .circle-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #2c2c2e; background: #1c1c1e; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>Wishlist của Bòi Bói Boi 🧞‍♀️</h1>
     <div class="sub">MÓN QUÀ ANH THÍCH - BẤM LÀ CÓ NHOÉEEE 💌</div>
-    
     <div class="form-box">
         <label>❤️ TÊN QUÀ TẶNG / MÓN ĂN</label>
         <input type="text" id="itemName" placeholder="Nhập tên món...">
@@ -67,7 +54,7 @@
                 <label>📂 DANH MỤC</label>
                 <select id="itemCate">
                     <option value="👩‍❤️‍👨 Quà đôi">👩‍❤️‍👨 Quà đôi</option>
-                    <option value="⚽️ Thể thao">⚽️ Thể thao</option>
+                    <option value="⚽ Thể thao">⚽ Thể thao</option>
                     <option value="👕 Thời trang">👕 Thời trang</option>
                     <option value="💻 Công nghệ">💻 Công nghệ</option>
                     <option value="🍔 Ăn uống">🍔 Ăn uống</option>
@@ -79,8 +66,7 @@
             </div>
         </div>
         <label>📝 GHI CHÚ</label>
-        <textarea id="itemNote" placeholder="Màu sắc, kích cỡ, địa chỉ..."></textarea>
-        
+        <textarea id="itemNote" placeholder="Màu sắc, kích cỡ..."></textarea>
         <label>🔥 ĐỘ ƯU TIÊN</label>
         <div class="p-group">
             <div class="p-btn" onclick="selP(6, this, '🔥 PHẢI CÓ')">🔥 PHẢI CÓ</div>
@@ -91,14 +77,12 @@
         </div>
         <button class="add-btn" onclick="sendData()">GỬI ĐẾN VŨ TRỤ 🚀</button>
     </div>
-
-    <div class="list-container" id="targetList">
+    <div class="list-container">
         <h2>Danh sách ước mơ 🧚‍♀️</h2>
         <div id="activeList"></div>
         <h2 style="color:var(--green); border-color:var(--green)">Đã hốt ✅</h2>
         <div id="doneList"></div>
     </div>
-
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
@@ -113,83 +97,58 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let curP = null;
-    let lastId = null;
+    let recentlyId = null;
 
     function fVND(i) {
         let v = i.value.replace(/\D/g, "");
         i.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
-    
     function selP(lv, btn, txt) {
         document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         curP = { lv, txt };
     }
-
     function sendData() {
         const name = document.getElementById('itemName').value;
         const price = document.getElementById('itemPrice').value;
         const cate = document.getElementById('itemCate').value;
         const note = document.getElementById('itemNote').value;
-        if (!name || !curP) return alert("Bà chọn độ ưu tiên đi!");
-
-        const ref = db.ref('wishlist_final_v8').push();
-        lastId = ref.key;
-
+        if (!name || !curP) return alert("Bà chưa chọn đủ!");
+        const ref = db.ref('wishlist_v10').push();
+        recentlyId = ref.key;
         ref.set({ name, price: price || "0", cate, note, priority: curP, status: 'waiting', time: Date.now() }).then(() => {
-            confetti({ shapes: [confetti.shapeFromText({ text: curP.lv === 6 ? '🔥' : '💖', scalar: 2.5 })], particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            
-            // RESET NGAY LẬP TỨC
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, shapes: [confetti.shapeFromText({ text: curP.lv === 6 ? '🔥' : '🎁', scalar: 3 })] });
             document.getElementById('itemName').value = "";
             document.getElementById('itemPrice').value = "";
             document.getElementById('itemNote').value = "";
             document.getElementById('itemCate').selectedIndex = 0;
             document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
             curP = null;
-
             setTimeout(() => {
-                const el = document.getElementById(lastId);
-                if(el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    el.classList.add('new-item');
-                }
-            }, 300);
+                const el = document.getElementById(recentlyId);
+                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('new-item-flash'); setTimeout(() => el.classList.remove('new-item-flash'), 4000); }
+            }, 500);
         });
     }
-
     function toggleStatus(id, s) {
         const next = s === 'waiting' ? 'done' : 'waiting';
-        db.ref('wishlist_final_v8/' + id).update({ status: next });
-        if(next === 'done') confetti({ particleCount: 100, shapes: [confetti.shapeFromText({ text: '💃', scalar: 2 })], origin: { y: 0.8 } });
+        db.ref('wishlist_v10/' + id).update({ status: next });
+        if(next === 'done') confetti({ particleCount: 100, shapes: [confetti.shapeFromText({ text: '💃', scalar: 2 })], origin: { y: 0.7 } });
     }
-
-    db.ref('wishlist_final_v8').on('value', (snap) => {
+    db.ref('wishlist_v10').on('value', (snap) => {
         const aBox = document.getElementById('activeList');
         const dBox = document.getElementById('doneList');
         let aH = "", dH = "";
         const items = [];
         snap.forEach(c => { items.push({id: c.key, ...c.val()}); });
         items.sort((a, b) => b.priority.lv - a.priority.lv || b.time - a.time);
-
         items.forEach(i => {
             const isD = i.status === 'done';
-            const html = `
-                <div class="card ${isD ? 'is-done' : ''}" id="${i.id}">
-                    <div class="info">
-                        <span class="badge p${i.priority.lv}">${i.priority.txt}</span>
-                        <h3>${i.name}</h3>
-                        <p>${i.cate} • 💰 ${i.price}đ</p>
-                        ${i.note ? `<p class="note-text">📝 ${i.note}</p>` : ''}
-                    </div>
-                    <div class="actions">
-                        <button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button>
-                        <button class="circle-btn" onclick="confirm('Xoá nha bà?') && db.ref('wishlist_final_v8/${i.id}').remove()">🗑️</button>
-                    </div>
-                </div>`;
-            if(isD) dH += html; else aH += html;
+            const h = `<div class="card ${isD ? 'is-done' : ''}" id="${i.id}"><div class="info"><span class="badge p${i.priority.lv}">${i.priority.txt}</span><h3>${i.name}</h3><p>${i.cate} • 💰 ${i.price}đ</p>${i.note ? `<p class="note-txt">📝 ${i.note}</p>` : ''}</div><div class="actions"><button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button><button class="circle-btn" onclick="confirm('Xóa nha?') && db.ref('wishlist_v10/${i.id}').remove()">🗑️</button></div></div>`;
+            if(isD) dH += h; else aH += h;
         });
-        aBox.innerHTML = aH || "<p style='text-align:center; color:#333; font-size:12px;'>Đang đợi quà...</p>";
-        dBox.innerHTML = dH || "<p style='text-align:center; color:#333; font-size:12px;'>Chưa hốt được gì...</p>";
+        aBox.innerHTML = aH || "<p style='text-align:center;color:#333;font-size:12px;'>Đang chờ quà...</p>";
+        dBox.innerHTML = dH || "<p style='text-align:center;color:#333;font-size:12px;'>Trống...</p>";
     });
 </script>
 </body>
