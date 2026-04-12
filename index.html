@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist Storm 🧞‍♀️</title>
+    <title>Wishlist Realtime Final 🧞‍♀️</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -13,21 +13,24 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
         h1 { font-size: 28px; font-weight: 900; color: var(--pink); margin: 20px 0 5px; font-style: italic; text-align: center; }
         .sub { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 30px; text-align: center; }
-        .form-box { width: 100%; max-width: 400px; background: var(--card); border-radius: 35px; padding: 25px; box-sizing: border-box; border: 1px solid #2c2c2e; margin-bottom: 20px; position: relative; }
+        .form-box { width: 100%; max-width: 400px; background: var(--card); border-radius: 35px; padding: 25px; box-sizing: border-box; border: 1px solid #2c2c2e; margin-bottom: 20px; }
         label { font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 10px; display: block; text-transform: uppercase; }
-        input, select, textarea { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: none; }
+        input, textarea { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; }
+        .select-wrapper { position: relative; width: 100%; }
+        select { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: none; -webkit-appearance: none; }
+        .select-wrapper::after { content: '▼'; position: absolute; right: 15px; top: 18px; color: var(--pink); font-size: 12px; pointer-events: none; }
         textarea { height: 60px; resize: none; font-family: inherit; }
         .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
         .p-group { display: flex; flex-direction: column; gap: 10px; }
         .p-btn { background: #1c1c1e; border: 1.5px solid #2c2c2e; padding: 15px; border-radius: 20px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.1s; }
         .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.2); color: var(--pink); transform: scale(1.05); }
         .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 20px; border-radius: 40px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; transition: 0.1s; }
-        .add-btn:active { transform: scale(0.8) rotate(-1deg); background: var(--pink); box-shadow: 0 0 30px rgba(242, 162, 192, 0.4); }
+        .add-btn:active { transform: scale(0.85); background: var(--pink); }
         .list-container { width: 100%; max-width: 400px; padding-bottom: 50px; }
         h2 { font-size: 18px; font-weight: 900; margin: 40px 0 20px; padding-left: 10px; border-left: 4px solid var(--pink); }
         .card { background: var(--card); border-radius: 30px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; }
-        .new-item-flash { animation: flash-brilliant 1.5s ease-in-out infinite; }
-        @keyframes flash-brilliant { 0% { border-color: #2c2c2e; } 50% { border-color: var(--pink); box-shadow: 0 0 25px var(--pink); background: #222; } 100% { border-color: #2c2c2e; } }
+        .new-item-flash { animation: flash-brilliant 1s ease-in-out 3; }
+        @keyframes flash-brilliant { 0% { border-color: #2c2c2e; } 50% { border-color: var(--pink); box-shadow: 0 0 20px var(--pink); background: #222; } 100% { border-color: #2c2c2e; } }
         .card.is-done { opacity: 0.3; filter: grayscale(1); }
         .info h3 { margin: 0; font-size: 18px; font-weight: 800; }
         .info p { margin: 5px 0 0; font-size: 12px; color: var(--gray); }
@@ -38,24 +41,25 @@
         .p4 { background: rgba(48, 209, 88, 0.2); color: #30d158; } 
         .p3 { background: rgba(10, 132, 255, 0.2); color: #0a84ff; } 
         .p2 { background: rgba(242, 162, 192, 0.2); color: #f2a2c0; } 
-        .circle-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #2c2c2e; background: #1c1c1e; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.2s; }
-        .circle-btn:active { transform: scale(0.8); }
+        .circle-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #2c2c2e; background: #1c1c1e; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>Wishlist của Bòi Bói Boi 🧞‍♀️</h1>
-    <div class="sub">Thêm món quà anh thích vào đây nhoéeee💌</div>
+    <div class="sub">MÓN QUÀ ANH THÍCH - BẤM LÀ CÓ NHOÉEEE 💌</div>
     <div class="form-box">
         <label>❤️ TÊN QUÀ TẶNG</label>
         <input type="text" id="itemName" placeholder="Nhập tên món...">
         <div class="row">
-            <select id="itemCate">
-                <option value="👩‍❤️‍👨 Quà đôi">👩‍❤️‍👨 Quà đôi</option>
-                <option value="⚽ Thể thao">⚽ Thể thao</option>
-                <option value="👕 Thời trang">👕 Thời trang</option>
-                <option value="💻 Công nghệ">💻 Công nghệ</option>
-                <option value="🍔 Ăn uống">🍔 Ăn uống</option>
-            </select>
+            <div class="select-wrapper">
+                <select id="itemCate">
+                    <option value="👩‍❤️‍👨 Quà đôi">👩‍❤️‍👨 Quà đôi</option>
+                    <option value="⚽ Thể thao">⚽ Thể thao</option>
+                    <option value="👕 Thời trang">👕 Thời trang</option>
+                    <option value="💻 Công nghệ">💻 Công nghệ</option>
+                    <option value="🍔 Ăn uống">🍔 Ăn uống</option>
+                </select>
+            </div>
             <input type="text" id="itemPrice" placeholder="Giá" onkeyup="fVND(this)">
         </div>
         <label>📝 GHI CHÚ</label>
@@ -68,7 +72,7 @@
             <div class="p-btn" onclick="selP(3, this, '🌷 Thích nha')">🌷 Thích nha</div>
             <div class="p-btn" onclick="selP(2, this, '💬 FOMO')">💬 FOMO</div>
         </div>
-        <button class="add-btn" onclick="sendData()">GỬI ĐẾN VŨ TRỤ 🚀</button>
+        <button class="add-btn" id="submitBtn" onclick="sendData()">GỬI ĐẾN VŨ TRỤ 🚀</button>
     </div>
     <div class="list-container">
         <h2>Danh sách ước mơ 🧚‍♀️</h2>
@@ -90,7 +94,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let curP = null;
-    let nextId = "";
+    let lastKey = "";
 
     function fVND(i) {
         let v = i.value.replace(/\D/g, "");
@@ -106,30 +110,39 @@
         const price = document.getElementById('itemPrice').value;
         const cate = document.getElementById('itemCate').value;
         const note = document.getElementById('itemNote').value;
-        if (!name || !curP) return alert("Chọn độ ưu tiên!");
+        if (!name || !curP) return alert("Bà chọn độ ưu tiên đã!");
+
+        const rect = document.getElementById('submitBtn').getBoundingClientRect();
+        const x = (rect.left + rect.width / 2) / window.innerWidth;
+        const y = (rect.top + rect.height / 2) / window.innerHeight;
 
         const shapes = ['🎁', '💖', '🔥', '⭐', '🎉'].map(t => confetti.shapeFromText({ text: t, scalar: 3 }));
-        confetti({ particleCount: 250, spread: 100, origin: { y: 0.5 }, shapes });
-        confetti({ particleCount: 250, spread: 160, origin: { y: 0.6 }, shapes });
+        confetti({ particleCount: 300, spread: 100, origin: { x, y }, shapes });
 
-        const ref = db.ref('wishlist_v_final_storm').push();
-        nextId = ref.key;
+        const ref = db.ref('wishlist_v1').push();
+        lastKey = ref.key;
         ref.set({ name, price: price || "0", cate, note, priority: curP, status: 'waiting', time: Date.now() });
 
         document.getElementById('itemName').value = "";
         document.getElementById('itemPrice').value = "";
         document.getElementById('itemNote').value = "";
         document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
-        
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         curP = null;
+
+        setTimeout(() => {
+            const el = document.getElementById(lastKey);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('new-item-flash');
+            }
+        }, 100);
     }
     function toggleStatus(id, s) {
         const next = s === 'waiting' ? 'done' : 'waiting';
-        db.ref('wishlist_v_final_storm/' + id).update({ status: next });
+        db.ref('wishlist_v1/' + id).update({ status: next });
         if(next === 'done') confetti({ particleCount: 150, origin: { y: 0.8 }, shapes: [confetti.shapeFromText({ text: '✅', scalar: 2 })] });
     }
-    db.ref('wishlist_v_final_storm').on('value', (snap) => {
+    db.ref('wishlist_v1').on('value', (snap) => {
         const aBox = document.getElementById('activeList');
         const dBox = document.getElementById('doneList');
         let aH = "", dH = "";
@@ -138,12 +151,11 @@
         items.sort((a, b) => b.priority.lv - a.priority.lv || b.time - a.time);
         items.forEach(i => {
             const isD = i.status === 'done';
-            const isNew = i.id === nextId ? 'new-item-flash' : '';
-            const h = `<div class="card ${isD ? 'is-done' : ''} ${isNew}" id="${i.id}"><div class="info"><span class="badge p${i.priority.lv}">${i.priority.txt}</span><h3>${i.name}</h3><p>${i.cate} • 💰 ${i.price}đ</p>${i.note ? `<p class="note-txt">📝 ${i.note}</p>` : ''}</div><div class="actions"><button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button><button class="circle-btn" onclick="confirm('Xóa?') && db.ref('wishlist_v_final_storm/${i.id}').remove()">🗑️</button></div></div>`;
+            const h = `<div class="card ${isD ? 'is-done' : ''} ${i.id === lastKey ? 'new-item-flash' : ''}" id="${i.id}"><div class="info"><span class="badge p${i.priority.lv}">${i.priority.txt}</span><h3>${i.name}</h3><p>${i.cate} • 💰 ${i.price}đ</p>${i.note ? `<p class="note-txt">📝 ${i.note}</p>` : ''}</div><div class="actions"><button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button><button class="circle-btn" onclick="confirm('Xóa?') && db.ref('wishlist_v1/${i.id}').remove()">🗑️</button></div></div>`;
             if(isD) dH += h; else aH += h;
         });
-        aBox.innerHTML = aH || "<p style='text-align:center;color:#333;font-size:12px;'>...</p>";
-        dBox.innerHTML = dH || "<p style='text-align:center;color:#333;font-size:12px;'>...</p>";
+        aBox.innerHTML = aH || "...";
+        dBox.innerHTML = dH || "...";
     });
 </script>
 </body>
