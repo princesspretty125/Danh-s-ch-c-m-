@@ -9,51 +9,34 @@
     <style>
         :root { --bg: #000; --card: #121212; --text: #fff; --gray: #888; --pink: #ff2d55; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
-        
         .tab-menu { display: flex; justify-content: center; gap: 20px; padding: 20px 0; background: #000; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
         .tab-link { color: var(--gray); font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; transition: 0.3s; padding: 5px 10px; }
         .tab-link.active { color: var(--pink); border-bottom: 2px solid var(--pink); }
-
         .slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .sheet { width: 100vw; padding: 20px; box-sizing: border-box; min-height: 100vh; }
-
         h1 { font-weight: 800; font-size: 26px; text-align: center; margin-bottom: 5px; color: #ff85a2; }
         .sub { text-align: center; font-size: 10px; color: var(--gray); letter-spacing: 1px; margin-bottom: 30px; text-transform: uppercase; }
-        
         .input-card { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 30px; border: 1px solid #222; }
         label { font-size: 10px; font-weight: 600; color: var(--gray); display: block; margin-bottom: 8px; }
         input, textarea { width: 100%; background: #1a1a1a; border: 1px solid #222; border-radius: 12px; padding: 12px; color: white; margin-bottom: 15px; outline: none; font-family: inherit; box-sizing: border-box; }
-        
-        /* Select có mũi tên */
         .select-wrapper { position: relative; width: 100%; margin-bottom: 15px; }
         select { width: 100%; background: #1a1a1a; border: 1px solid #222; border-radius: 12px; padding: 12px; color: white; outline: none; font-family: inherit; appearance: none; cursor: pointer; }
         .select-wrapper::after { content: '⌵'; position: absolute; right: 15px; top: 50%; transform: translateY(-30%); color: var(--gray); pointer-events: none; font-size: 18px; }
-
-        .row { display: flex; gap: 10px; align-items: flex-start; }
-        
+        .row { display: flex; gap: 10px; }
         .priority-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        .p-btn { background: #1a1a1a; border: 1px solid #222; padding: 14px; border-radius: 12px; color: var(--gray); text-align: center; cursor: pointer; transition: 0.3s; font-weight: 600; font-family: inherit; }
+        .p-btn { background: #1a1a1a; border: 1px solid #222; padding: 14px; border-radius: 12px; color: var(--gray); text-align: center; cursor: pointer; transition: 0.3s; font-weight: 600; }
         .p-btn.active { border-color: var(--pink); color: white; background: rgba(255, 45, 85, 0.1); box-shadow: 0 0 15px var(--pink); }
-
-        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 18px; border-radius: 40px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .add-btn:active { transform: scale(0.9); }
-
-        .item { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.5s; }
+        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 18px; border-radius: 40px; font-weight: 800; font-size: 16px; cursor: pointer; }
+        .item { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.5s; border-left: 6px solid #333; }
         .item.highlight-new { animation: bFlash 1.5s ease; border: 2px solid var(--pink); }
-        @keyframes bFlash { 0% { transform: scale(0.8); background: #333; } 50% { transform: scale(1.05); background: #444; } 100% { transform: scale(1); background: var(--card); } }
+        @keyframes bFlash { 0% { transform: scale(0.8); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
         .item.done { opacity: 0.3; filter: grayscale(1); }
-        
-        .item-info h3 { margin: 0; font-size: 18px; }
-        .note-text { color: #888; font-size: 13px; display: block; margin-top: 5px; font-style: italic; }
         .badge { font-size: 9px; padding: 3px 8px; border-radius: 6px; color: white; display: inline-block; margin-bottom: 5px; font-weight: bold; }
-        
-        .item-btns { display: flex; flex-direction: column; gap: 10px; }
-        .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #222; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-
-        .img-box-wrapper { position: relative; width: 130px; margin-bottom: 15px; cursor: pointer; }
-        .img-box { width: 130px; height: 130px; background: #1a1a1a; border-radius: 15px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #222; color: white; cursor: pointer; font-size: 18px; margin-bottom: 5px; }
+        .img-box-wrapper { position: relative; width: 110px; margin-bottom: 15px; cursor: pointer; }
+        .img-box { width: 110px; height: 110px; background: #1a1a1a; border-radius: 15px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .cam-icon { position: absolute; bottom: -5px; right: -5px; width: 35px; height: 35px; background: #333; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 16px; }
+        .cam-icon { position: absolute; bottom: -5px; right: -5px; width: 30px; height: 30px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -71,24 +54,11 @@
             <label>❤️ TÊN QUÀ TẶNG</label>
             <input type="text" id="n1" placeholder="Tên món quà...">
             <div class="row">
-                <div style="flex:1">
-                    <label>📂 DANH MỤC</label>
-                    <div class="select-wrapper">
-                        <select id="c1">
-                            <option>💕 Lãng Mạn</option>
-                            <option>👕 Thời Trang</option>
-                            <option>💻 Công Nghệ</option>
-                            <option>⚽ Thể Thao</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="flex:1">
-                    <label>$ GIÁ ƯỚC TÍNH</label>
-                    <input type="text" id="p1" placeholder="500,000" onkeyup="fmt(this)">
-                </div>
+                <div style="flex:1"><label>📂 DANH MỤC</label><div class="select-wrapper"><select id="c1"><option>💕 Lãng Mạn</option><option>👕 Thời Trang</option><option>💻 Công Nghệ</option><option>⚽ Thể Thao</option></select></div></div>
+                <div style="flex:1"><label>$ GIÁ (VNĐ)</label><input type="text" id="p1" placeholder="500,000" onkeyup="fmt(this)"></div>
             </div>
             <label>🔥 ĐỘ ƯU TIÊN</label>
-            <div class="priority-group">
+            <div class="priority-group" id="pg1">
                 <button class="p-btn" data-l="5">🔥 PHẢI CÓ</button>
                 <button class="p-btn" data-l="4">💕 Cần rồi</button>
                 <button class="p-btn" data-l="3">🥺 Muốn lắm</button>
@@ -99,7 +69,7 @@
             <textarea id="nt1" placeholder="Màu sắc, kích thước..."></textarea>
             <button class="add-btn" onclick="handleSave('gifts')">🚀 THÊM VÀO WISHLIST</button>
         </div>
-        <h2 id="head1">Danh sách ước mơ 🦋</h2>
+        <h2 id="h1">Danh sách ước mơ 🦋</h2>
         <div id="list1"></div>
     </div>
 
@@ -109,41 +79,24 @@
         <div class="input-card">
             <label>🍜 TÊN MÓN ĂN</label>
             <input type="text" id="n2" placeholder="Tên món ăn...">
-            
             <label>🖼️ ẢNH MÓN ĂN</label>
-            <div class="img-box-wrapper" onclick="document.getElementById('fileInp').click()">
-                <div class="img-box">
-                    <img id="prevImg" style="display:none"> <span id="prevTxt" style="color:#444">Chọn ảnh</span>
-                </div>
+            <div class="img-box-wrapper" onclick="document.getElementById('fInp').click()">
+                <div class="img-box"><img id="pImg" style="display:none"> <span id="pTxt">Chọn ảnh</span></div>
                 <div class="cam-icon">📷</div>
             </div>
-            <input type="file" id="fileInp" hidden accept="image/*" onchange="previewImg(this)">
-
+            <input type="file" id="fInp" hidden accept="image/*" onchange="readImg(this)">
             <div class="row">
-                <div style="flex:1">
-                    <label>📂 KIỂU ĂN</label>
-                    <div class="select-wrapper">
-                        <select id="c2">
-                            <option>🍲 Lẩu/Nướng</option>
-                            <option>🍣 Đồ Nhật/Hàn</option>
-                            <option>🍰 Tráng miệng</option>
-                            <option>☕ Cà phê</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="flex:1">
-                    <label>$ GIÁ DỰ KIẾN</label>
-                    <input type="text" id="p2" placeholder="200,000" onkeyup="fmt(this)">
-                </div>
+                <div style="flex:1"><label>📂 KIỂU ĂN</label><div class="select-wrapper"><select id="c2"><option>🍲 Lẩu/Nướng</option><option>🍣 Đồ Nhật/Hàn</option><option>🍰 Tráng miệng</option><option>☕ Cà phê</option></select></div></div>
+                <div style="flex:1"><label>$ GIÁ DỰ KIẾN</label><input type="text" id="p2" placeholder="200,000" onkeyup="fmt(this)"></div>
             </div>
             <label>🔥 ĐỘ THÈM</label>
-            <div class="priority-group">
+            <div class="priority-group" id="pg2">
                 <button class="p-btn" data-l="5">🔥 PHẢI ĂN</button>
                 <button class="p-btn" data-l="2">😋 Thèm thèm</button>
             </div>
             <button class="add-btn" onclick="handleSave('foods')">📡 BẮN TÍN HIỆU</button>
         </div>
-        <h2 id="head2">Danh sách thèm thuồng 🍤</h2>
+        <h2 id="h2">Danh sách thèm thuồng 🍤</h2>
         <div id="list2"></div>
     </div>
 </div>
@@ -169,23 +122,22 @@
     window.goTab = (i) => {
         document.getElementById('mainSlider').style.transform = `translateX(-${i * 100}vw)`;
         document.querySelectorAll('.tab-link').forEach((l, idx) => l.classList.toggle('active', i === idx));
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.previewImg = (input) => {
+    window.readImg = (i) => {
         const r = new FileReader();
-        r.onload = (e) => {
-            document.getElementById('prevImg').src = e.target.result;
-            document.getElementById('prevImg').style.display = 'block';
-            document.getElementById('prevTxt').style.display = 'none';
-            curImg = e.target.result;
+        r.onload = (e) => { 
+            document.getElementById('pImg').src = e.target.result; 
+            document.getElementById('pImg').style.display = 'block';
+            document.getElementById('pTxt').style.display = 'none';
+            curImg = e.target.result; 
         };
-        r.readAsDataURL(input.files[0]);
+        r.readAsDataURL(i.files[0]);
     };
 
-    document.querySelectorAll('.p-btn').forEach(btn => {
-        btn.onclick = function() {
-            this.parentElement.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.p-btn').forEach(b => {
+        b.onclick = function() {
+            this.parentElement.querySelectorAll('.p-btn').forEach(x => x.classList.remove('active'));
             this.classList.add('active');
             curP = { lv: parseInt(this.dataset.l), txt: this.innerText, clr: clrs[this.dataset.l] };
         };
@@ -195,29 +147,31 @@
 
     window.handleSave = (path) => {
         const isG = path === 'gifts';
-        const n = document.getElementById(isG ? 'n1' : 'n2').value;
-        const p = document.getElementById(isG ? 'p1' : 'p2').value;
-        const c = document.getElementById(isG ? 'c1' : 'c2').value;
-        const nt = isG ? document.getElementById('nt1').value : "";
+        const name = document.getElementById(isG ? 'n1' : 'n2').value;
+        const price = document.getElementById(isG ? 'p1' : 'p2').value;
+        const cate = document.getElementById(isG ? 'c1' : 'c2').value;
+        const note = isG ? document.getElementById('nt1').value : "";
 
-        if(!n || !curP) return alert("Nhập đủ thông tin má ơi!");
+        if(!name) return alert("Nhập tên cái đã má!");
+        if(!curP) return alert("Chọn độ ưu tiên/độ thèm dùm con cái!");
 
         push(ref(db, path), {
-            name: n, price: p || "0", cate: c, p: curP, note: nt, img: isG ? "" : curImg, status: 'wait', time: Date.now()
+            name, price: price || "0", cate, p: curP, note, img: isG ? "" : curImg, status: 'wait', time: Date.now()
         }).then((res) => {
             lastId = res.key;
-            const ics = isG ? ['🎁', '💖', '✨'] : ['🍱', '🍣', '🍤'];
-            ics.forEach((ic, i) => setTimeout(() => confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 }, shapes: [confetti.shapeFromText({ text: ic, scalar: 2 })] }), i * 150));
+            const ics = isG ? ['🎁','💖','✨'] : ['🍱','🍣','🍤'];
+            ics.forEach((ic, i) => setTimeout(() => confetti({ particleCount: 40, spread: 70, origin: { y: 0.8 }, shapes: [confetti.shapeFromText({ text: ic, scalar: 2 })] }), i * 100));
             
-            document.getElementById(isG ? 'head1' : 'head2').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById(isG ? 'h1' : 'h2').scrollIntoView({ behavior: 'smooth' });
             
+            // Reset
             document.getElementById(isG ? 'n1' : 'n2').value = "";
             document.getElementById(isG ? 'p1' : 'p2').value = "";
             if(isG) document.getElementById('nt1').value = "";
-            else { document.getElementById('prevImg').style.display='none'; document.getElementById('prevTxt').style.display='block'; curImg=""; }
+            else { document.getElementById('pImg').style.display='none'; document.getElementById('pTxt').style.display='block'; curImg=""; }
             document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
             curP = null;
-        });
+        }).catch(err => alert("Lỗi rồi má: " + err.message));
     };
 
     const load = (path, target) => {
@@ -227,16 +181,16 @@
             arr.sort((a, b) => b.p.lv - a.p.lv);
 
             document.getElementById(target).innerHTML = arr.map(i => `
-                <div class="item ${i.status=='done'?'done':''} ${i.id === lastId ? 'highlight-new' : ''}" style="border-left: 6px solid ${i.p.clr}">
+                <div class="item ${i.status=='done'?'done':''} ${i.id === lastId ? 'highlight-new' : ''}" style="border-left-color: ${i.p.clr}">
                     <div style="flex:1">
                         <span class="badge" style="background:${i.p.clr}">${i.p.txt}</span>
-                        ${i.img ? `<img src="${i.img}" style="width:130px;display:block;margin:10px 0;border-radius:12px">` : ''}
-                        <h3>${i.name}</h3>
-                        <p style="font-size:13px; color:var(--gray); margin:5px 0">${i.price}đ • ${i.cate}</p>
-                        ${i.note ? `<span class="note-text">📝 ${i.note}</span>` : ''}
+                        ${i.img ? `<img src="${i.img}" style="width:110px;display:block;margin:10px 0;border-radius:12px">` : ''}
+                        <h3 style="margin:5px 0">${i.name}</h3>
+                        <p style="font-size:12px;color:#888;margin:0">${i.price}đ • ${i.cate}</p>
+                        ${i.note ? `<span style="font-size:12px;color:#ff85a2;display:block;margin-top:5px">📝 ${i.note}</span>` : ''}
                     </div>
-                    <div class="item-btns">
-                        <button class="btn-circle" onclick="upd('${path}','${i.id}','${i.status}')">${path === 'foods' ? '✅' : '💃'}</button>
+                    <div style="display:flex;flex-direction:column">
+                        <button class="btn-circle" onclick="upd('${path}','${i.id}','${i.status}')">${path==='foods'?'✅':'💃'}</button>
                         <button class="btn-circle" onclick="del('${path}','${i.id}')">🗑️</button>
                     </div>
                 </div>
@@ -246,7 +200,8 @@
 
     load('gifts', 'list1'); load('foods', 'list2');
     window.upd = (path, id, s) => update(ref(db, `${path}/${id}`), { status: s=='done'?'wait':'done' });
-    window.del = (path, id) => confirm("Xoá món này hả?") && remove(ref(db, `${path}/${id}`));
+    window.del = (path, id) => confirm("Xoá thiệt hả?") && remove(ref(db, `${path}/${id}`));
 </script>
 </body>
 </html>
+
