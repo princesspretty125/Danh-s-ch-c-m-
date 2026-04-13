@@ -14,6 +14,10 @@
         .card-main { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 2.5rem; }
         
         .priority-btn { background: #121212; border: 1px solid #222; transition: 0.3s; color: #666; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        
+        .wish-active { background: rgba(244, 114, 182, 0.2) !important; border-color: #f472b6 !important; color: #f472b6 !important; }
+        .food-active { background: rgba(249, 115, 22, 0.2) !important; border-color: #f97316 !important; color: #f97316 !important; }
+
         .active-p-1 { background: rgba(113, 113, 122, 0.2); border-color: #71717a !important; color: #a1a1aa !important; }
         .active-p-2 { background: rgba(16, 185, 129, 0.2); border-color: #10b981 !important; color: #10b981 !important; }
         .active-p-3 { background: rgba(244, 114, 182, 0.2); border-color: #f472b6 !important; color: #f472b6 !important; }
@@ -21,36 +25,23 @@
         .active-p-5 { background: rgba(220, 38, 38, 0.2); border-color: #dc2626 !important; color: #dc2626 !important; }
 
         #pw-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        
         .tab-badge { position: absolute; top: -6px; right: -6px; background: #ff3b30; color: white; font-size: 10px; font-weight: 900; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
         .new-dot { position: absolute; top: 15px; right: 15px; width: 10px; height: 10px; background: #0084ff; border-radius: 50%; box-shadow: 0 0 10px #0084ff; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
         .bought-item { opacity: 0.35; filter: grayscale(1); transition: 0.5s; }
-
         .shake { animation: shake 0.4s ease-in-out; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .emoji-particle {
-            position: fixed; pointer-events: none; z-index: 20000;
-            font-size: 32px; animation: emojiFloat 2.5s forwards cubic-bezier(0.12, 0.85, 0.5, 1);
-        }
-        @keyframes emojiFloat {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(720deg); opacity: 0; }
-        }
-        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .emoji-particle { position: fixed; pointer-events: none; z-index: 20000; font-size: 32px; animation: emojiFloat 2.5s forwards cubic-bezier(0.12, 0.85, 0.5, 1); }
+        @keyframes emojiFloat { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(720deg); opacity: 0; } }
         .list-header { border-left: 4px solid #f472b6; padding-left: 12px; margin-bottom: 20px; margin-top: 10px; }
         .list-header-food { border-left: 4px solid #f97316; }
         .sub-title { font-size: 11px; font-weight: 600; font-style: italic; opacity: 0.8; letter-spacing: 0.02em; margin-top: 6px; display: block; line-height: 1.4; }
+        .item-highlight { animation: highlight 2s ease-out; }
+        @keyframes highlight { 0% { background: #333; } 100% { background: #0d0d0d; } }
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4 pb-24">
 
-    <!-- MÀN HÌNH KHÓA -->
     <div id="pw-screen">
         <i class="fas fa-heart text-pink-600 text-5xl mb-6"></i>
         <h2 class="text-sm font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">Mật mã của sự yêu thương</h2>
@@ -58,15 +49,11 @@
         <p id="pw-error" class="text-red-500 text-[10px] mt-4 font-bold opacity-0 transition-opacity">Sai rồi con quỷ! Nhập lại đi 😡</p>
     </div>
 
-    <!-- LOGIC XỬ LÝ -->
     <script type="module">
-        // ==========================================
-        // CÀI PASSCODE TẠI ĐÂY:
         const MASTER_PASSCODE = "congchuabuombuom"; 
-        // ==========================================
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, update, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
@@ -159,11 +146,28 @@
                 status: 'pending', addedBy: currentUser, createdAt: Date.now()
             };
             const newRef = push(ref(db, path));
-            seenIds.push(newRef.key); localStorage.setItem('seen_v_f_v3', JSON.stringify(seenIds));
-            update(newRef, payload); burst(); shootEmoji();
-            nameEl.value = ""; priceEl.value = "";
-            if(path==='foods') { document.getElementById('fPrev').classList.add('hidden'); document.getElementById('camIcon').classList.remove('hidden'); imgB64 = ""; }
-            else { document.getElementById('giftNote').value = ""; }
+            const newId = newRef.key;
+            seenIds.push(newId); localStorage.setItem('seen_v_f_v3', JSON.stringify(seenIds));
+            set(newRef, payload).then(() => {
+                burst(); shootEmoji();
+                nameEl.value = ""; priceEl.value = "";
+                if(path==='foods') { document.getElementById('fPrev').classList.add('hidden'); document.getElementById('camIcon').classList.remove('hidden'); imgB64 = ""; }
+                else { document.getElementById('giftNote').value = ""; }
+                
+                setTimeout(() => {
+                    const el = document.getElementById(newId);
+                    if(el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('item-highlight');
+                    }
+                }, 500);
+            });
+        };
+
+        window.delItem = (path, id) => {
+            if(confirm('Xóa nha?')) {
+                remove(ref(db, `${path}/${id}`));
+            }
         };
 
         window.toggleStatus = (path, id, curr, event) => {
@@ -173,6 +177,7 @@
         };
 
         window.markSeen = (id) => { if(!seenIds.includes(id)) { seenIds.push(id); localStorage.setItem('seen_v_f_v3', JSON.stringify(seenIds)); refreshBadges(); } };
+        
         const refreshBadges = () => {
             onValue(ref(db), (snap) => {
                 const data = snap.val() || {};
@@ -212,7 +217,7 @@
                             </div>
                             <div class="flex flex-col gap-2">
                                 <button onclick="event.stopPropagation(); toggleStatus('${path}', '${item.id}', '${item.status}', event)" class="w-12 h-12 bg-zinc-900 rounded-2xl flex items-center justify-center text-lg active:scale-90 transition-all border border-zinc-800">${isD ? '🔄' : (path==='gifts'?'💖':'😋')}</button>
-                                <button onclick="event.stopPropagation(); confirm('Xóa nha?') && remove(ref(db, '${path}/${item.id}'))" class="w-12 h-12 bg-zinc-950 rounded-2xl flex items-center justify-center text-zinc-800 active:text-red-500 transition-colors"><i class="fas fa-trash text-xs"></i></button>
+                                <button onclick="event.stopPropagation(); delItem('${path}', '${item.id}')" class="w-12 h-12 bg-zinc-950 rounded-2xl flex items-center justify-center text-zinc-800 active:text-red-500 transition-colors"><i class="fas fa-trash text-xs"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -220,8 +225,9 @@
             });
         };
 
-        window.selP = (v) => { selPrio = v; document.querySelectorAll('.gift-p').forEach(b => b.classList.remove('active-p-1','active-p-2','active-p-3','active-p-4','active-p-5')); document.getElementById('p-'+v).classList.add('active-p-'+v); };
-        window.selFP = (v) => { foodPrio = v; document.querySelectorAll('.food-p').forEach(b => b.classList.remove('active-p-1','active-p-2','active-p-3','active-p-4','active-p-5')); document.getElementById('fp-'+v).classList.add('active-p-'+v); };
+        window.selP = (v) => { selPrio = v; document.querySelectorAll('.gift-p').forEach(b => b.classList.remove('wish-active')); document.getElementById('p-'+v).classList.add('wish-active'); };
+        window.selFP = (v) => { foodPrio = v; document.querySelectorAll('.food-p').forEach(b => b.classList.remove('food-active')); document.getElementById('fp-'+v).classList.add('food-active'); };
+        
         window.switchTab = (tab) => {
             document.getElementById('tab-gifts').classList.toggle('hidden', tab !== 'gifts');
             document.getElementById('tab-foods').classList.toggle('hidden', tab !== 'foods');
@@ -235,9 +241,7 @@
         listen('gifts', 'wishlistContainer'); listen('foods', 'foodListContainer');
     </script>
 
-    <!-- NỘI DUNG CHÍNH -->
     <div class="w-full max-w-md">
-        <!-- Navigation -->
         <div class="flex justify-center gap-3 mb-10 sticky top-4 z-50">
             <button id="btn-tab-gift" onclick="switchTab('gifts')" class="relative flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-pink-600 text-white shadow-lg transition-all">
                 🎁 Wishlist <span id="badge-g" class="tab-badge hidden">0</span>
@@ -247,7 +251,6 @@
             </button>
         </div>
 
-        <!-- TAB WISHLIST -->
         <div id="tab-gifts">
             <div class="text-center my-10 px-4">
                 <h1 class="text-2xl font-black italic text-pink-500 uppercase leading-tight">Wishlist của Bòi Bói Boi 🫃🏻</h1>
@@ -266,11 +269,11 @@
                         <input type="text" id="giftPrice" placeholder="Giá tiền..." class="w-full p-4.5 rounded-2xl font-black text-pink-400">
                     </div>
                     <div class="grid grid-cols-1 gap-2">
-                        <button onclick="selP(1)" id="p-1" class="priority-btn gift-p p-3 rounded-xl active-p-1">💬 FOMO</button>
+                        <button onclick="selP(1)" id="p-1" class="priority-btn gift-p p-3 rounded-xl wish-active">💬 FOMO</button>
                         <button onclick="selP(2)" id="p-2" class="priority-btn gift-p p-3 rounded-xl">🌷 Thích nha</button>
                         <button onclick="selP(3)" id="p-3" class="priority-btn gift-p p-3 rounded-xl">🙄 Muốn lắm</button>
                         <button onclick="selP(4)" id="p-4" class="priority-btn gift-p p-3 rounded-xl">💕 Cần rồi</button>
-                        <button onclick="selP(5)" id="p-5" class="priority-btn gift-p p-3 rounded-xl text-red-500">🔥 PHẢI CÓ</button>
+                        <button onclick="selP(5)" id="p-5" class="priority-btn gift-p p-3 rounded-xl">🔥 PHẢI CÓ</button>
                     </div>
                     <textarea id="giftNote" placeholder="Ghi chú thêm..." class="w-full p-4.5 rounded-2xl h-24 resize-none text-sm"></textarea>
                     <button onclick="add('gifts')" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black uppercase active:scale-95 transition-transform">🚀 Thêm vào danh sách 💞</button>
@@ -283,7 +286,6 @@
             <div id="wishlistContainer" class="space-y-5"></div>
         </div>
 
-        <!-- TAB FOODLIST -->
         <div id="tab-foods" class="hidden">
             <div class="text-center my-10 px-4">
                 <h1 class="text-2xl font-black italic text-orange-500 uppercase leading-tight">Foodlist toàn món ngonnn 🤤</h1>
@@ -309,11 +311,11 @@
                         <input type="text" id="foodPrice" placeholder="Giá tham khảo..." class="w-full p-4.5 rounded-2xl font-black text-orange-400">
                     </div>
                     <div class="grid grid-cols-1 gap-2">
-                        <button onclick="selFP(1)" id="fp-1" class="priority-btn food-p p-3 rounded-xl active-p-1">🍜 Thử thôi</button>
+                        <button onclick="selFP(1)" id="fp-1" class="priority-btn food-p p-3 rounded-xl food-active">🍜 Thử thôi</button>
                         <button onclick="selFP(2)" id="fp-2" class="priority-btn food-p p-3 rounded-xl">🍕 Khá thèm</button>
                         <button onclick="selFP(3)" id="fp-3" class="priority-btn food-p p-3 rounded-xl">🍔 Rất đói</button>
                         <button onclick="selFP(4)" id="fp-4" class="priority-btn food-p p-3 rounded-xl">🍣 Ghiền quá</button>
-                        <button onclick="selFP(5)" id="fp-5" class="priority-btn food-p p-3 rounded-xl text-orange-500">🔥 THÈM CHẾT MẤT</button>
+                        <button onclick="selFP(5)" id="fp-5" class="priority-btn food-p p-3 rounded-xl">🔥 THÈM CHẾT MẤT</button>
                     </div>
                     <button onclick="add('foods')" class="w-full py-5 bg-orange-500 text-white rounded-[2.5rem] font-black uppercase active:scale-95 transition-transform">🛒 CHỐT ĐƠN 😋</button>
                 </div>
@@ -326,7 +328,6 @@
         </div>
     </div>
 
-    <!-- Overlay chọn vai trò -->
     <div id="roleOverlay" class="fixed inset-0 bg-black/95 z-[9999] flex flex-col items-center justify-center hidden">
         <div class="bg-zinc-900 p-10 rounded-[3rem] border border-zinc-800 text-center w-[85%] max-w-sm shadow-2xl">
             <h2 class="text-white mb-8 text-2xl font-black">BẠN LÀ AI? 🧐</h2>
