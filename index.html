@@ -41,6 +41,23 @@
         .winner-highlight { border-color: #f97316 !important; box-shadow: 0 0 25px rgba(249, 115, 22, 0.6); transform: scale(1.02); z-index: 10; transition: all 0.2s; }
 .flash-winner { animation: flashAnim 0.5s infinite; }
 @keyframes flashAnim { 0%, 100% { background-color: #0d0d0d; } 50% { background-color: #1a1a1a; border-color: #fb923c !important; } }
+        /* Thanh vận công ẩn bên dưới nút */
+.loading-container {
+    width: 100%;
+    height: 6px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+    display: none; /* Bình thường sẽ ẩn đi */
+}
+.loading-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #f97316, #fb923c);
+    box-shadow: 0 0 10px #f97316;
+}
+
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4 pb-24">
@@ -246,23 +263,62 @@
         const format = (id) => { document.getElementById(id).addEventListener('input', (e) => { let v = e.target.value.replace(/\D/g, ""); if (v) e.target.value = new Intl.NumberFormat().format(v); }); };
         format('giftPrice'); format('foodPrice');
         listen('gifts', 'wishlistContainer'); listen('foods', 'foodListContainer');
-        window.pickRandomFood = () => {
+        window.startLoading = () => {
+    const btn = document.getElementById('spin-btn');
+    const loadingArea = document.getElementById('loading-area');
+    const statusBar = document.getElementById('status-bar');
+    
+    // Kiểm tra xem có món nào không trước khi chạy
     const items = document.querySelectorAll('#foodListContainer > div:not(.bought-item)');
-    if (items.length === 0) return;
+    if (items.length === 0) return alert("Chưa có món nào để quay hết eim ơi!");
+
+    // Vô hiệu hóa nút để tránh bấm liên tục bị lỗi
+    btn.style.pointerEvents = 'none';
+    btn.innerText = "ĐANG TÍNH TOÁN...";
+    loadingArea.style.display = 'block';
+    statusBar.style.width = '0%';
+
+    let width = 0;
+    const interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                loadingArea.style.display = 'none';
+                btn.style.pointerEvents = 'auto';
+                btn.innerText = "🎲 KHÔNG BIẾT ĂN GÌ? QUAY ĐI! 🎲";
+                window.pickRandomFood(); // Sau khi đầy thanh thì gọi hàm quay
+            }, 200);
+        } else {
+            width += 2; // Tốc độ đầy thanh máu
+            statusBar.style.width = width + '%';
+        }
+    }, 20); // 20ms mỗi bước tăng -> mất khoảng 1 giây để đầy thanh
+};
+
+window.pickRandomFood = () => {
+    const items = document.querySelectorAll('#foodListContainer > div:not(.bought-item)');
     let count = 0, totalFlips = 25, speed = 60;
+
     const startSpin = () => {
-        items.forEach(el => { el.classList.remove('winner-highlight', 'flash-winner'); el.style.borderColor = '#1a1a1a'; });
+        items.forEach(el => { 
+            el.classList.remove('winner-highlight', 'flash-winner'); 
+            el.style.borderColor = '#1a1a1a'; 
+        });
         const currentEl = items[Math.floor(Math.random() * items.length)];
         currentEl.style.borderColor = '#f97316';
         currentEl.style.backgroundColor = '#1a1a1a';
         count++;
+
         if (count < totalFlips) {
             if (count > 15) speed += 30;
             setTimeout(startSpin, speed);
         } else {
             currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             currentEl.classList.add('winner-highlight', 'flash-winner');
-            setTimeout(() => { currentEl.classList.remove('flash-winner'); currentEl.style.backgroundColor = '#0d0d0d'; }, 3000);
+            setTimeout(() => { 
+                currentEl.classList.remove('flash-winner'); 
+                currentEl.style.backgroundColor = '#0d0d0d'; 
+            }, 3000);
         }
     };
     startSpin();
@@ -321,9 +377,12 @@
                 <span class="sub-title text-orange-400">Anh ơi em đói em mún ăn cái nàyyyyy 🥺</span>
             </div>
             <div id="random-picker-area" class="mb-6 px-4">
-    <button onclick="pickRandomFood()" class="w-full py-4 bg-gradient-to-r from-orange-600 to-orange-400 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-[0_10px_20px_rgba(234,88,12,0.3)] active:scale-95 transition-all">
+    <button id="spin-btn" onclick="startLoading()" class="w-full py-4 bg-gradient-to-r from-orange-600 to-orange-400 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-[0_10px_20px_rgba(234,88,12,0.3)] active:scale-95 transition-all">
         🎲 KHÔNG BIẾT ĂN GÌ? QUAY ĐI! 🎲
     </button>
+    <div id="loading-area" class="loading-container">
+        <div id="status-bar" class="loading-bar"></div>
+    </div>
 </div>
 
             <div class="card-main p-8 mb-10 shadow-xl">
