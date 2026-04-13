@@ -29,6 +29,18 @@ if (password !== "congchuabuombuom") { // Thay 123456 bằng pass của mày
         };
 
         const app = initializeApp(firebaseConfig);
+        let notificationCount = 0;
+
+const setAppBadge = (count) => {
+    if ('setAppBadge' in navigator) {
+        navigator.setAppBadge(count);
+    }
+};
+
+if ('clearAppBadge' in navigator) {
+    navigator.clearAppBadge();
+}
+
         const db = getDatabase(app);
         const wishlistRef = ref(db, 'gifts');
         const foodRef = ref(db, 'foods');
@@ -135,6 +147,9 @@ const scrollToNewItem = (itemId, isFoodTab) => {
     document.getElementById('priority-1').classList.add('active-priority');
 
     scrollToNewItem(newRef.key, false); 
+                notificationCount++;
+    setAppBadge(notificationCount);
+
 };
 
 window.addFood = (btn) => {
@@ -171,6 +186,9 @@ window.addFood = (btn) => {
     document.getElementById('food-priority-1').classList.add('active-food-priority');
 
     scrollToNewItem(newRef.key, true); 
+    notificationCount++;
+setAppBadge(notificationCount);
+
 };
 
 onValue(wishlistRef, (snapshot) => {
