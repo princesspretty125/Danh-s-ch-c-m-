@@ -267,54 +267,66 @@
     const btn = document.getElementById('spin-btn');
     const loadingArea = document.getElementById('loading-area');
     const statusBar = document.getElementById('status-bar');
-    
-    // Kiểm tra xem có món nào không trước khi chạy
     const items = document.querySelectorAll('#foodListContainer > div:not(.bought-item)');
+
     if (items.length === 0) return alert("Chưa có món nào để quay hết eim ơi!");
 
-    // Vô hiệu hóa nút để tránh bấm liên tục bị lỗi
+    // Vô hiệu hóa nút và hiện thanh máu
     btn.style.pointerEvents = 'none';
-    btn.innerText = "ĐANG TÍNH TOÁN...";
+    btn.style.opacity = '0.7';
+    btn.innerText = "ĐANG TÌM MÓN...";
     loadingArea.style.display = 'block';
     statusBar.style.width = '0%';
 
     let width = 0;
     const interval = setInterval(() => {
+        width += 2;
+        statusBar.style.width = width + '%';
+
+        // KỊCH TÍNH: Khi thanh máu chạy được 70%, bắt đầu cho các ô nhảy nhẹ luôn
+        if (width > 70 && width < 100) {
+            const randomEl = items[Math.floor(Math.random() * items.length)];
+            randomEl.style.borderColor = '#f97316';
+            setTimeout(() => { randomEl.style.borderColor = '#1a1a1a'; }, 50);
+        }
+
         if (width >= 100) {
             clearInterval(interval);
-            setTimeout(() => {
-                loadingArea.style.display = 'none';
-                btn.style.pointerEvents = 'auto';
-                btn.innerText = "🎲 KHÔNG BIẾT ĂN GÌ? QUAY ĐI! 🎲";
-                window.pickRandomFood(); // Sau khi đầy thanh thì gọi hàm quay
-            }, 200);
-        } else {
-            width += 2; // Tốc độ đầy thanh máu
-            statusBar.style.width = width + '%';
+            // Chuyển sang quay chính thức NGAY LẬP TỨC, không chờ đợi
+            loadingArea.style.display = 'none';
+            btn.style.opacity = '1';
+            btn.innerText = "🎲 ĐANG QUAYYYY... 🎲";
+            window.pickRandomFood(btn); 
         }
-    }, 20); // 20ms mỗi bước tăng -> mất khoảng 1 giây để đầy thanh
+    }, 20); 
 };
 
-window.pickRandomFood = () => {
+window.pickRandomFood = (btn) => {
     const items = document.querySelectorAll('#foodListContainer > div:not(.bought-item)');
-    let count = 0, totalFlips = 25, speed = 60;
+    let count = 0, totalFlips = 30, speed = 50; // Tăng số lần nhảy cho mượt
 
     const startSpin = () => {
         items.forEach(el => { 
             el.classList.remove('winner-highlight', 'flash-winner'); 
             el.style.borderColor = '#1a1a1a'; 
         });
+
         const currentEl = items[Math.floor(Math.random() * items.length)];
         currentEl.style.borderColor = '#f97316';
         currentEl.style.backgroundColor = '#1a1a1a';
         count++;
 
         if (count < totalFlips) {
-            if (count > 15) speed += 30;
+            if (count > 20) speed += 40; // Chậm dần về cuối
             setTimeout(startSpin, speed);
         } else {
             currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             currentEl.classList.add('winner-highlight', 'flash-winner');
+            
+            // Xong xuôi thì trả lại nút bấm
+            btn.style.pointerEvents = 'auto';
+            btn.innerText = "🎲 KHÔNG BIẾT ĂN GÌ? QUAY ĐI! 🎲";
+            
             setTimeout(() => { 
                 currentEl.classList.remove('flash-winner'); 
                 currentEl.style.backgroundColor = '#0d0d0d'; 
